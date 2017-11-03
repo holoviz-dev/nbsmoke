@@ -10,38 +10,13 @@ pytest-nbsmoke
     :target: https://ci.appveyor.com/project/ContinuumAnalytics/nbsmoke/branch/master
     :alt: See Build Status on AppVeyor
 
-Basic ("non data") notebook testing: do they run ok? do they contain lint?
-Also lets you store html to look at.
+Basic notebook smoke tests: Do they run ok? Do they contain lint?
 
-WARNING: early stage proof of concept; work in progress. Use at your
-own risk.
+**WARNING: early stage proof of concept; work in progress. Use at your
+own risk.**
 
 Created with a cookiecutter and modified until it seemed to
 work. There's loads of cleanup left to do (and boilerplate to remove).
-
-Different from nbval: unlike nbval, this is really about running nbs
-as someone would run, without modifications to support skipping cells,
-kernel hooks, or anything else...
-
-pytest --nbsmoke-run notebooks/
-
-Do notebooks run without errors, plus store html (hmm...what if there's an error)?
-
-pytest --nbsmoke-run --store-html=/scratch notebooks/
-
-Lint check notebooks:
-
-pytest --nbsmoke-lint notebooks/
-
-Specifying options, use 'ini' e.g. setup.cfg or tox.ini or pytest.ini:
-cell_timeout: seconds allowed per cell (see nbconvert timeout)
-it_is_nb_file: case insensitive re to match for file to be considered notebook; defaults to ``^.*\.ipynb``
-
-Developing? Run the tests:
-pip install -e .
-pytest tests/
-
-
 
 
 ----
@@ -49,16 +24,15 @@ pytest tests/
 This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`_'s `Cookiecutter-pytest-plugin`_ template.
 
 
-Features
---------
-
-* TODO
-
-
 Requirements
 ------------
 
-* TODO
+* pytest >= 3.1.1
+* jupyter_client
+* ipykernel
+* nbformat
+* nbconvert
+* pyflakes
 
 
 Installation
@@ -72,12 +46,34 @@ You can install "pytest-nbsmoke" via `pip`_ from `PyPI`_::
 Usage
 -----
 
-* TODO
+Do all notebooks in examples/ run without errors?
+
+    $ pytest --nbsmoke-run examples/
+
+Do all notebooks in examples/ run without errors, and store html to look at afterwards:
+
+    $ pytest --nbsmoke-run --store-html=/scratch examples/
+
+Lint check notebooks in examples/
+
+    $ pytest --nbsmoke-lint notebooks/
+
+Instead of all files in a directory, you can specify a list e.g.
+
+    $ pytest --nbsmoke-lint notebooks/Untitled*.ipynb
+
+Additional options are available by standard pytest 'ini' configuration in setup.cfg, pytest.ini, or tox.ini:
+
+    [pytest]
+    it_is_nb_file = ^.*\.something$   # case insensitive re to match for file to be considered notebook; defaults to ``^.*\.ipynb``
+    cell_timeout = 600                # seconds allowed per cell (see nbconvert timeout)
+
 
 Contributing
 ------------
-Contributions are very welcome. Tests can be run with `tox`_, please ensure
-the coverage at least stays the same before you submit a pull request.
+
+First, install using ``pip install -e .``. Then run the tests using ``tox`` or ``pytest -v tests/``.
+
 
 License
 -------
@@ -92,10 +88,7 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 
 .. _`Cookiecutter`: https://github.com/audreyr/cookiecutter
 .. _`@hackebrot`: https://github.com/hackebrot
-.. _`MIT`: http://opensource.org/licenses/MIT
 .. _`BSD-3`: http://opensource.org/licenses/BSD-3-Clause
-.. _`GNU GPL v3.0`: http://www.gnu.org/licenses/gpl-3.0.txt
-.. _`Apache Software License 2.0`: http://www.apache.org/licenses/LICENSE-2.0
 .. _`cookiecutter-pytest-plugin`: https://github.com/pytest-dev/cookiecutter-pytest-plugin
 .. _`file an issue`: https://github.com/ContinuumIO/pytest-nbsmoke/issues
 .. _`pytest`: https://github.com/pytest-dev/pytest
