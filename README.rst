@@ -1,7 +1,3 @@
-==============
-pytest-nbsmoke
-==============
-
 .. image:: https://travis-ci.org/ContinuumIO/nbsmoke.svg?branch=master
     :target: https://travis-ci.org/ContinuumIO/nbsmoke
     :alt: See Build Status on Travis CI
@@ -9,6 +5,11 @@ pytest-nbsmoke
 .. image:: https://ci.appveyor.com/api/projects/status/sk3qp2w9oovkg4wb/branch/master?svg=true
     :target: https://ci.appveyor.com/project/ContinuumAnalytics/nbsmoke/branch/master
     :alt: See Build Status on AppVeyor
+
+
+==============
+pytest-nbsmoke
+==============
 
 Basic notebook smoke tests: Do they run ok? Do they contain lint?
 
@@ -46,23 +47,25 @@ You can install "pytest-nbsmoke" via `pip`_ from `PyPI`_::
 Usage
 -----
 
-Do all notebooks in examples/ run without errors?
+Check all notebooks in examples/ run without errors::
 
     $ pytest --nbsmoke-run examples/
 
-Do all notebooks in examples/ run without errors, and store html to look at afterwards:
+Check all notebooks in examples/ run without errors, and store html to
+look at afterwards::
 
     $ pytest --nbsmoke-run --store-html=/scratch examples/
 
-Lint check notebooks in examples/
+Lint check notebooks in examples/::
 
     $ pytest --nbsmoke-lint notebooks/
 
-Instead of all files in a directory, you can specify a list e.g.
+Instead of all files in a directory, you can specify a list e.g.::
 
     $ pytest --nbsmoke-lint notebooks/Untitled*.ipynb
 
-Additional options are available by standard pytest 'ini' configuration in setup.cfg, pytest.ini, or tox.ini:
+Additional options are available by standard pytest 'ini'
+configuration in setup.cfg, pytest.ini, or tox.ini::
 
     [pytest]
     it_is_nb_file = ^.*\.something$   # case insensitive re to match for file to be considered notebook; defaults to ``^.*\.ipynb``
@@ -72,19 +75,22 @@ Additional options are available by standard pytest 'ini' configuration in setup
 Contributing
 ------------
 
-First, install using ``pip install -e .``. Then run the tests using ``tox`` or ``pytest -v tests/``.
+First, install using ``pip install -e .``. Then run the tests using
+``tox`` or ``pytest -v tests/``.
 
 
 License
 -------
 
-Distributed under the terms of the `BSD-3`_ license, "pytest-nbsmoke" is free and open source software
+Distributed under the terms of the `BSD-3`_ license, "pytest-nbsmoke"
+is free and open source software.
 
 
 Issues
 ------
 
-If you encounter any problems, please `file an issue`_ along with a detailed description.
+If you encounter any problems, please `file an issue`_ (ideally
+including a copy of any problematic notebook).
 
 .. _`Cookiecutter`: https://github.com/audreyr/cookiecutter
 .. _`@hackebrot`: https://github.com/hackebrot
