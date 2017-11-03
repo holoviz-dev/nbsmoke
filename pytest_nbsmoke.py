@@ -39,7 +39,7 @@ def pytest_addoption(parser):
 
     parser.addini('cell_timeout', 'nbconvert cell timeout')
     parser.addini('it_is_nb_file', 're to determine whether file is notebook')
-
+    parser.addini('skip_run', 're to skip (multi-line; one pattern per line)')
 
 @pytest.fixture
 def bar(request):
@@ -53,6 +53,7 @@ from nbconvert.preprocessors import ExecutePreprocessor
 
 class RunNb(pytest.Item):
     def runtest(self):
+        self._skip()      
         with io.open(self.name,encoding='utf8') as nb:
             notebook = nbformat.read(nb, as_version=4)
 
@@ -73,6 +74,14 @@ class RunNb(pytest.Item):
                 html, resources = he.from_notebook_node(notebook)
                 with io.open(os.path.join(self.parent.parent.config.option.store_html,os.path.basename(self.name)+'.html'),'w',encoding='utf8') as f:
                     f.write(html)
+
+    def _skip(self):        
+        _skip_patterns = self.parent.parent.config.getini('skip_run')
+        if _skip_patterns != '':
+            skip_patterns = _skip_patterns.splitlines()
+            for pattern in skip_patterns:
+                if re.match(pattern,self.name,re.IGNORECASE):
+                    pytest.skip()
 
 
 def _insert_get_ipython(nb):

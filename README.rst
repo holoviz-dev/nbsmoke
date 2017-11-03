@@ -68,8 +68,16 @@ Additional options are available by standard pytest 'ini'
 configuration in setup.cfg, pytest.ini, or tox.ini::
 
     [pytest]
-    it_is_nb_file = ^.*\.something$   # case insensitive re to match for file to be considered notebook; defaults to ``^.*\.ipynb``
-    cell_timeout = 600                # seconds allowed per cell (see nbconvert timeout)
+    # when running, seconds allowed per cell (see nbconvert timeout)
+    cell_timeout = 600
+
+    # notebooks to skip running; one case insensitive re to match per line
+    skip_run = ^.*skipme\.ipynb$
+               ^.*skipmetoo.*$
+
+    # case insensitive re to match for file to be considered notebook;
+    # defaults to ``^.*\.ipynb``
+    it_is_nb_file = ^.*\.something$
 
 
 Contributing

@@ -201,3 +201,19 @@ def test_it_is_nbfile(testdir):
     testdir.makefile('.ipynb', testing123=_nb%{'the_source':"1/0"})
     result = testdir.runpytest('--nbsmoke-run','-v')
     assert result.ret == 5
+
+def test_skip_run(testdir):
+    testdir.makeini("""
+        [pytest]
+        skip_run = ^.*skipme\.ipynb$
+                   ^.*skipmetoo.*$
+    """)
+
+    testdir.makefile('.ipynb', skipme=_nb%{'the_source':"1/0"})
+    testdir.makefile('.ipynb', alsoskipme=_nb%{'the_source':"1/0"})
+    testdir.makefile('.ipynb', skipmetoo=_nb%{'the_source':"1/0"})    
+    testdir.makefile('.ipynb', skipmenot=_nb%{'the_source':"1/1"})
+    
+    result = testdir.runpytest('--nbsmoke-run','-v')
+    assert result.ret == 0
+
