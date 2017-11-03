@@ -91,10 +91,10 @@ class RunNb(pytest.Item):
 def _insert_get_ipython(nb):
     # so pyflakes doesn't get confused about magics
     if len(nb['cells']) > 0:
-        get_ipython_cell = nb['cells'][0].copy()
         # the get_ipython() is so pyflakes doesn't complain if no
-        # magics present.
-        get_ipython_cell.source = 'from IPython import get_ipython\nget_ipython()'
+        # magics present.        
+        get_ipython_cell = nbformat.v4.new_code_cell(
+            'from IPython import get_ipython\nget_ipython()')
         nb['cells'].insert(0,get_ipython_cell)
 
 
