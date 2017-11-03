@@ -16,7 +16,7 @@ def read(fname):
 setup(
     name='pytest-nbsmoke',
     version=versioneer.get_version(),
-    author='Marimo',
+    author='pytest-nbsmoke contributors',
     license='BSD-3',
     url='https://github.com/ioam/pytest-nbsmoke',
     description='Basic notebook checks. Do they run? Do they contain lint?',
