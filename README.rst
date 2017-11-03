@@ -16,10 +16,6 @@ Basic notebook smoke tests: Do they run ok? Do they contain lint?
 **WARNING: early stage proof of concept; work in progress. Use at your
 own risk.**
 
-Created with a cookiecutter and modified until it seemed to
-work. There's loads of cleanup left to do (and boilerplate to remove).
-
-
 ----
 
 This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`_'s `Cookiecutter-pytest-plugin`_ template.
