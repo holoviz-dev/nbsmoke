@@ -115,7 +115,7 @@ def insert_ipython_run_cell_magic_cell_content(py):
                     newlines.append(l)
         else:
             newlines.append(line)
-    return u"\n".join(newlines)
+    return "\n".join(newlines)
 
 
 class LintNb(pytest.Item):
@@ -124,10 +124,10 @@ class LintNb(pytest.Item):
             nb = nbformat.read(nbfile, as_version=4)
             _insert_get_ipython(nb)
             py, resources = nbconvert.PythonExporter().from_notebook_node(nb)
+            py = insert_ipython_run_cell_magic_cell_content(py)            
             if sys.version_info[0]==2:
                 # notebooks will start with "coding: utf-8", but py already unicode
                 py = py.encode('utf8')
-            py = insert_ipython_run_cell_magic_cell_content(py)
             if flakes.check(py,self.name) != 0:
                 raise AssertionError
 
