@@ -102,13 +102,17 @@ def insert_ipython_run_cell_magic_cell_content(py):
     # assuming cell magic always looks like this:
     #   'get_ipython().run_cell_magic(\'x\', \'y\', "z")'
     # where x is the %% command, y is the rest of the line, and z is
-    # the cell code, insert z the cell code back into the source for
-    # pyflakes to look at.
+    # the cell code, insert all non-%-starting lines from z back into
+    # the source for pyflakes to look at. This is more of a proof of
+    # concept hack than something guaranteed to work...
     newlines = []
     lines = py.split('\n')
     for line in lines:
         if line.startswith('get_ipython().run_cell_magic('):
-            newlines+=ast.parse(line).body[0].value.args[2].s.splitlines()
+            content = ast.parse(line).body[0].value.args[2].s.splitlines()
+            for l in content:
+                if not l.startswith('%'):
+                    newlines.append(l)
         else:
             newlines.append(line)
     return u"\n".join(newlines)

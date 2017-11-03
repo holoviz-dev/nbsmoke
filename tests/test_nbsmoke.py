@@ -121,7 +121,60 @@ _nb = u'''
 }
 '''
 
-_nb2 = u'''
+_nb2a = u'''
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import holoviews as hv\\n",
+    "import os\\n",
+    "from holoviews.operation.datashader import datashade, regrid"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%%%%opts RGB [invert_yaxis=True width=400 height=400]\\n",
+    "adim = hv.Dimension('A')\\n",
+    "bdim = hv.Dimension('B')\\n",
+    "paths = [os.path.join('data', f) for f in ['a','b']]\\n",
+    "hv.Layout([datashade(hv.Curve(p, kdims=[adim], vdims=[bdim])) for p in paths]).cols(2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%%%%opts Image [width=500 height=500 colorbar=True colorbar_position='left' logz=True]\\n",
+    "%%%%opts Image [xticks=[1,2] yticks=[2,3]] (cmap='viridis')\\n",
+    "%%%%opts HLine (color='red' line_width=2) VLine (color='red', line_width=2)\\n",
+    "im = hv.Image({'a':1, 'b':2, 'c':3}, kdims=[adim, bdim], \\n",
+    "              vdims=[hv.Dimension('c')])\\n",
+    "regrid(im) * regrid(im)"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
+'''
+
+_nb2b = u'''
 {
  "cells": [
   {
@@ -145,7 +198,21 @@ _nb2 = u'''
     "adim = hv.Dimension('A')\\n",
     "bdim = hv.Dimension('B')\\n",
     "paths = [os.path.join('data', f) for f in ['a','b']]\\n",
-    "hv.Layout([datashade(hv.Curve(p, kdims=[adim], vdims=[bdim])) for p in paths]).cols(2)"
+    "hv.Layout([datashade(hv.Curve(no, kdims=[adim], vdims=[bdim])) for p in paths]).cols(2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%%%%opts Image [width=500 height=500 colorbar=True colorbar_position='left' logz=True]\\n",
+    "%%%%opts Image [xticks=xticks yticks=yticks] (cmap='viridis')\\n",
+    "%%%%opts HLine (color='red' line_width=2) VLine (color='red', line_width=2)\\n",
+    "im = hv.Image({'a':a, 'b':b}, kdims=['a'], \\n",
+    "              vdims=[hv.Dimension('b')])\\n",
+    "regrid(im) * lines(no)"
    ]
   }
  ],
@@ -159,6 +226,8 @@ _nb2 = u'''
  "nbformat_minor": 2
 }
 '''
+
+
 
 
 def test_definitely_ran_paranoid(testdir):
@@ -207,10 +276,15 @@ def test_lintgood(testdir):
     result = testdir.runpytest('--nbsmoke-lint','-v')
     assert result.ret == 0
 
-def test_lintextra(testdir):
-    testdir.makefile('.ipynb', testing123=_nb2)
+def test_lintextra_good(testdir):
+    testdir.makefile('.ipynb', testing123=_nb2a)
     result = testdir.runpytest('--nbsmoke-lint','-v')
     assert result.ret == 0
+
+def test_lintextra_bad(testdir):
+    testdir.makefile('.ipynb', testing123=_nb2b)
+    result = testdir.runpytest('--nbsmoke-lint','-v')
+    assert result.ret == 1
 
 def test_lintbad(testdir):
     testdir.makefile('.ipynb', testing123=_nb%{'the_source':"1/1 these undefined names are definitely undefined"})
