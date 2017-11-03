@@ -6,8 +6,8 @@ pytest-nbsmoke
     :target: https://travis-ci.org/ContinuumIO/nbsmoke
     :alt: See Build Status on Travis CI
 
-.. image:: https://ci.appveyor.com/api/projects/status/reuh381xg7f9ks83/branch/master?svg=true
-    :target: https://ci.appveyor.com/project/ceball/nbsmoke
+.. image:: https://ci.appveyor.com/api/projects/status/sk3qp2w9oovkg4wb/branch/master?svg=true
+    :target: https://ci.appveyor.com/project/ContinuumAnalytics/nbsmoke/branch/master
     :alt: See Build Status on AppVeyor
 
 Basic ("non data") notebook testing: do they run ok? do they contain lint?
