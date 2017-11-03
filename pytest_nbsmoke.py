@@ -9,51 +9,50 @@ import re
 import os
 import io
 import sys
-
-def pytest_addoption(parser):
-    group = parser.getgroup('nbsmoke')
-    group.addoption(
-        '--nbsmoke-run',
-        action="store_true",
-        help="help!")
-
-    group.addoption(
-        '--nbsmoke-lint',
-        action="store_true",
-        help="help!")
-
-    group.addoption(
-        '--store-html',
-        action="store",
-        dest='store_html',
-        default='',
-        help="help!")
-
-    group.addoption(
-        '--foo',
-        action='store',
-        dest='dest_foo',
-        default='2017',
-        help='Set the value for the fixture "bar".'
-    )
-
-    parser.addini('cell_timeout', 'nbconvert cell timeout')
-    parser.addini('it_is_nb_file', 're to determine whether file is notebook')
-    parser.addini('skip_run', 're to skip (multi-line; one pattern per line)')
-
-@pytest.fixture
-def bar(request):
-    return request.config.option.dest_foo
-
+import contextlib
 
 import nbformat
 import nbconvert
 from nbconvert.preprocessors import ExecutePreprocessor
 
 
+def pytest_addoption(parser):
+    group = parser.getgroup('nbsmoke')
+    group.addoption(
+        '--nbsmoke-run',
+        action="store_true",
+        help="Run notebooks using nbconvert to check for exceptions.")
+
+    group.addoption(
+        '--nbsmoke-lint',
+        action="store_true",
+        help="Lint check notebooks using flake8")
+
+    group.addoption(
+        '--store-html',
+        action="store",
+        dest='store_html',
+        default='',
+        help="When running, store rendered-to-html notebooks in the supplied path.")
+
+    parser.addini('cell_timeout', 'nbconvert cell timeout')
+    parser.addini('it_is_nb_file', 're to determine whether file is notebook')
+    parser.addini('skip_run', 're to skip (multi-line; one pattern per line)')
+
+
+@contextlib.contextmanager
+def cwd(d):
+    orig = os.getcwd()
+    os.chdir(d)
+    try:
+        yield
+    finally:
+        os.chdir(orig)
+
+
 class RunNb(pytest.Item):
     def runtest(self):
-        self._skip()      
+        self._skip()
         with io.open(self.name,encoding='utf8') as nb:
             notebook = nbformat.read(nb, as_version=4)
 
@@ -63,8 +62,10 @@ class RunNb(pytest.Item):
                           allow_errors=False,
                           # or sys.version_info[1] ?
                           kernel_name='python')
+
             ep = ExecutePreprocessor(**kwargs)
-            ep.preprocess(notebook,{})
+            with cwd(os.path.dirname(self.name)): # jupyter notebook always does this, right?
+                ep.preprocess(notebook,{})
 
             # TODO: clean up this option handling
             if self.parent.parent.config.option.store_html != '':
@@ -75,7 +76,7 @@ class RunNb(pytest.Item):
                 with io.open(os.path.join(self.parent.parent.config.option.store_html,os.path.basename(self.name)+'.html'),'w',encoding='utf8') as f:
                     f.write(html)
 
-    def _skip(self):        
+    def _skip(self):
         _skip_patterns = self.parent.parent.config.getini('skip_run')
         if _skip_patterns != '':
             skip_patterns = _skip_patterns.splitlines()

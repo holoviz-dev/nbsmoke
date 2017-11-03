@@ -24,12 +24,12 @@ This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`
 Requirements
 ------------
 
-* pytest >= 3.1.1
-* jupyter_client
-* ipykernel
-* nbformat
-* nbconvert
-* flake8
+* ``pytest>=3.1.1``
+* ``jupyter_client``
+* ``ipykernel``
+* ``nbformat``
+* ``nbconvert``
+* ``pyflakes``
 
 
 Installation

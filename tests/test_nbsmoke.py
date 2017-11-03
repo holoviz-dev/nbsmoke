@@ -3,29 +3,7 @@
 import os
 import io
 import sys
-
-def test_bar_fixture(testdir):
-    """Make sure that pytest accepts our fixture."""
-
-    # create a temporary pytest test module
-    testdir.makepyfile("""
-        def test_sth(bar):
-            assert bar == "europython2015"
-    """)
-
-    # run pytest with the following cmd args
-    result = testdir.runpytest(
-        '--foo=europython2015',
-        '-v'
-    )
-
-    # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines([
-        '*::test_sth PASSED',
-    ])
-
-    # make sure that that we get a '0' exit code for the testsuite
-    assert result.ret == 0
+import shutil
 
 
 def test_help_message(testdir):
@@ -35,7 +13,9 @@ def test_help_message(testdir):
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines([
         'nbsmoke:',
-        '*--foo=DEST_FOO*Set the value for the fixture "bar".',
+        '*--nbsmoke-run*',
+        '*--nbsmoke-lint*',
+        '*--store-html*'
     ])
 
 
@@ -88,7 +68,7 @@ def test_cell_timeout_ini_setting(testdir):
 
     # make sure that that we get a '0' exit code for the testsuite
     assert result.ret == 0
-    
+
 _nb = u'''
 {
  "cells": [
@@ -211,9 +191,17 @@ def test_skip_run(testdir):
 
     testdir.makefile('.ipynb', skipme=_nb%{'the_source':"1/0"})
     testdir.makefile('.ipynb', alsoskipme=_nb%{'the_source':"1/0"})
-    testdir.makefile('.ipynb', skipmetoo=_nb%{'the_source':"1/0"})    
+    testdir.makefile('.ipynb', skipmetoo=_nb%{'the_source':"1/0"})
     testdir.makefile('.ipynb', skipmenot=_nb%{'the_source':"1/1"})
-    
+
     result = testdir.runpytest('--nbsmoke-run','-v')
     assert result.ret == 0
 
+
+def test_cwd_like_jupyter_notebook(testdir):
+    p = testdir.tmpdir.mkdir("sub").join("hello.txt")
+    p.write("content")
+    testdir.makefile('.ipynb', testing123=_nb%{'the_source':"import os; assert os.path.isfile('hello.txt')"})
+    shutil.move('testing123.ipynb', 'sub')
+    result = testdir.runpytest('--nbsmoke-run','-v')
+    assert result.ret == 0
