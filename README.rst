@@ -33,7 +33,7 @@ Requirements
 * ipykernel
 * nbformat
 * nbconvert
-* pyflakes
+* flake8
 
 
 Installation

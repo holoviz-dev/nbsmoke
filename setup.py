@@ -27,7 +27,7 @@ setup(
                       'ipykernel',
                       'nbformat',
                       'nbconvert',
-                      'pyflakes'],
+                      'flake8'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Framework :: Pytest',
