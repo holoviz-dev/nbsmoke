@@ -18,7 +18,7 @@ setup(
     version=versioneer.get_version(),
     author='pytest-nbsmoke contributors',
     license='BSD-3',
-    url='https://github.com/ioam/pytest-nbsmoke',
+    url='https://github.com/ContinuumIO/nbsmoke',
     description='Basic notebook checks. Do they run? Do they contain lint?',
     long_description=read('README.rst'),
     py_modules=['pytest_nbsmoke'],
