@@ -16,6 +16,9 @@ Basic notebook smoke tests: Do they run ok? Do they contain lint?
 **WARNING: early stage proof of concept; work in progress. Use at your
 own risk.**
 
+In particular, this extension is supposed to handle ipython magics as
+far as possible, but has not yet been widely tested.
+
 ----
 
 This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`_'s `Cookiecutter-pytest-plugin`_ template.
@@ -58,7 +61,7 @@ Lint check notebooks in examples/::
 
 Instead of all files in a directory, you can specify a list e.g.::
 
-    $ pytest --nbsmoke-lint notebooks/Untitled*.ipynb
+    $ pytest --nbsmoke-run notebooks/Untitled*.ipynb
 
 Additional options are available by standard pytest 'ini'
 configuration in setup.cfg, pytest.ini, or tox.ini::

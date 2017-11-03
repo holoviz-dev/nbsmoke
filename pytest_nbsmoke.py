@@ -10,6 +10,9 @@ import os
 import io
 import sys
 import contextlib
+import ast # uh oh
+
+import pyflakes.api as flakes
 
 import nbformat
 import nbconvert
@@ -86,15 +89,31 @@ class RunNb(pytest.Item):
 
 
 def _insert_get_ipython(nb):
-    # so pyflakes doesn't get confused about magics, and also doesn't
-    # complain about this if magics not present.
+    # so pyflakes doesn't get confused about magics
     if len(nb['cells']) > 0:
         get_ipython_cell = nb['cells'][0].copy()
+        # the get_ipython() is so pyflakes doesn't complain if no
+        # magics present.
         get_ipython_cell.source = 'from IPython import get_ipython\nget_ipython()'
         nb['cells'].insert(0,get_ipython_cell)
 
 
-import pyflakes.api as flakes
+def insert_ipython_run_cell_magic_cell_content(py):
+    # assuming cell magic always looks like this:
+    #   'get_ipython().run_cell_magic(\'x\', \'y\', "z")'
+    # where x is the %% command, y is the rest of the line, and z is
+    # the cell code, insert z the cell code back into the source for
+    # pyflakes to look at.
+    newlines = []
+    lines = py.split('\n')
+    for line in lines:
+        if line.startswith('get_ipython().run_cell_magic('):
+            newlines+=ast.parse(line).body[0].value.args[2].s.splitlines()
+        else:
+            newlines.append(line)
+    return u"\n".join(newlines)
+
+
 class LintNb(pytest.Item):
     def runtest(self):
         with io.open(self.name,encoding='utf8') as nbfile:
@@ -104,6 +123,7 @@ class LintNb(pytest.Item):
             if sys.version_info[0]==2:
                 # notebooks will start with "coding: utf-8", but py already unicode
                 py = py.encode('utf8')
+            py = insert_ipython_run_cell_magic_cell_content(py)
             if flakes.check(py,self.name) != 0:
                 raise AssertionError
 

@@ -121,6 +121,46 @@ _nb = u'''
 }
 '''
 
+_nb2 = u'''
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import holoviews as hv\\n",
+    "import os\\n",
+    "from holoviews.operation.datashader import datashade"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%%%%opts RGB [invert_yaxis=True width=400 height=400]\\n",
+    "adim = hv.Dimension('A')\\n",
+    "bdim = hv.Dimension('B')\\n",
+    "paths = [os.path.join('data', f) for f in ['a','b']]\\n",
+    "hv.Layout([datashade(hv.Curve(p, kdims=[adim], vdims=[bdim])) for p in paths]).cols(2)"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
+'''
+
+
 def test_definitely_ran_paranoid(testdir):
     testdir.makefile('.ipynb', testing123=_nb%{'the_source':"open('x','w').write('y')"})
     result = testdir.runpytest('--nbsmoke-run','-v')
@@ -164,6 +204,11 @@ def test_rungood_html(testdir):
 
 def test_lintgood(testdir):
     testdir.makefile('.ipynb', testing123=_nb%{'the_source':"1/1"})
+    result = testdir.runpytest('--nbsmoke-lint','-v')
+    assert result.ret == 0
+
+def test_lintextra(testdir):
+    testdir.makefile('.ipynb', testing123=_nb2)
     result = testdir.runpytest('--nbsmoke-lint','-v')
     assert result.ret == 0
 
