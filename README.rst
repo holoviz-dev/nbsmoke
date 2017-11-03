@@ -78,6 +78,9 @@ Contributing
 First, install using ``pip install -e .``. Then run the tests using
 ``tox`` or ``pytest -v tests/``.
 
+New release to PyPI: ``git tag -a x.y.z -m "Something about release"
+&& git push --tags``.
+
 
 License
 -------
