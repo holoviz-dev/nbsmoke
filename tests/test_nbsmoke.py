@@ -22,7 +22,7 @@ def test_help_message(testdir):
 def test_cell_timeout_ini_setting(testdir):
     testdir.makeini("""
         [pytest]
-        cell_timeout = 300
+        cell_timeout = 123
     """)
 
     testdir.makepyfile("""
@@ -33,14 +33,14 @@ def test_cell_timeout_ini_setting(testdir):
             return request.config.getini('cell_timeout')
 
         def test_cell_timeout(cell_timeout):
-            assert int(cell_timeout) == 300
+            assert int(cell_timeout) == 123
     """)
 
     result = testdir.runpytest('-v')
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines([
-        '*::test_cell_timeout PASSED',
+        '*::test_cell_timeout PASSED*',
     ])
 
     # make sure that that we get a '0' exit code for the testsuite
