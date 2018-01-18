@@ -20,7 +20,7 @@ import ast # uh oh
 # consider switching to flake8, but it's probably too complex to use
 # for notebooks.
 
-import pyflakes
+import pyflakes.reporter, pyflakes.checker
 import _ast
 
 def flake_check(codeString, filename, reporter=None):
