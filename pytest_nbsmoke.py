@@ -23,7 +23,6 @@ import ast # uh oh
 import pyflakes
 import _ast
 
-import pyflakes.api as flakes
 def flake_check(codeString, filename, reporter=None):
     if reporter is None:
         reporter = pyflakes.reporter._makeDefaultReporter()
