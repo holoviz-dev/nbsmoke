@@ -47,28 +47,6 @@ def test_cell_timeout_ini_setting(testdir):
     assert result.ret == 0
 
 
-
-    testdir.makepyfile("""
-        import pytest
-
-        @pytest.fixture
-        def cell_timeout(request):
-            return request.config.getini('cell_timeout')
-
-        def test_cell_timeout(cell_timeout):
-            assert int(cell_timeout) == 300
-    """)
-
-    result = testdir.runpytest('-v')
-
-    # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines([
-        '*::test_cell_timeout PASSED',
-    ])
-
-    # make sure that that we get a '0' exit code for the testsuite
-    assert result.ret == 0
-
 _nb = u'''
 {
  "cells": [
