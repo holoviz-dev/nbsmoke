@@ -12,7 +12,73 @@ import sys
 import contextlib
 import ast # uh oh
 
+######################################################################
+######################################################################
+
+# This section is adding "# noqa" support to pyflakes. It's not
+# perfect (e.g. what if someone has "# noqa" in some string). Could
+# consider switching to flake8, but it's probably too complex to use
+# for notebooks.
+
+import pyflakes
+import _ast
+
 import pyflakes.api as flakes
+def flake_check(codeString, filename, reporter=None):
+    if reporter is None:
+        reporter = pyflakes.reporter._makeDefaultReporter()
+    # First, compile into an AST and handle syntax errors.
+    try:
+        tree = compile(codeString, filename, "exec", _ast.PyCF_ONLY_AST)
+    except SyntaxError:
+        value = sys.exc_info()[1]
+        msg = value.args[0]
+
+        (lineno, offset, text) = value.lineno, value.offset, value.text
+
+        if pyflakes.checker.PYPY:
+            if text is None:
+                lines = codeString.splitlines()
+                if len(lines) >= lineno:
+                    text = lines[lineno - 1]
+                    if sys.version_info >= (3, ) and isinstance(text, bytes):
+                        try:
+                            text = text.decode('ascii')
+                        except UnicodeDecodeError:
+                            text = None
+            offset -= 1
+
+        # If there's an encoding problem with the file, the text is None.
+        if text is None:
+            # Avoid using msg, since for the only known case, it contains a
+            # bogus message that claims the encoding the file declared was
+            # unknown.
+            reporter.unexpectedError(filename, 'problem decoding source')
+        else:
+            reporter.syntaxError(filename, msg, lineno, offset, text)
+        return 1
+    except Exception:
+        reporter.unexpectedError(filename, 'problem decoding source')
+        return 1
+    # Okay, it's syntactically valid.  Now check it.
+    w = pyflakes.checker.Checker(tree, filename)
+
+    ##########################
+    ## addition to pyflakes ##
+    NOQA = re.compile('# noqa', re.IGNORECASE)
+    noqa_lines = [i+1 for i,l in enumerate(codeString.splitlines()) if NOQA.search(l)]
+    w.messages[:] = [m for m in w.messages if m.lineno not in noqa_lines]
+    ##########################
+
+    w.messages.sort(key=lambda m: m.lineno)
+    for warning in w.messages:
+        reporter.flake(warning)
+    return len(w.messages)
+
+
+######################################################################
+######################################################################
+
 
 import nbformat
 import nbconvert
@@ -124,13 +190,13 @@ class LintNb(pytest.Item):
             nb = nbformat.read(nbfile, as_version=4)
             _insert_get_ipython(nb)
             py, resources = nbconvert.PythonExporter().from_notebook_node(nb)
-            py = insert_ipython_run_cell_magic_cell_content(py)            
+            py = insert_ipython_run_cell_magic_cell_content(py)
             if sys.version_info[0]==2:
                 # notebooks will start with "coding: utf-8", but py already unicode
                 py = py.encode('utf8')
-            if flakes.check(py,self.name) != 0:
+            if flake_check(py,self.name) != 0:
                 raise AssertionError
-
+            
 
 class IPyNbFile(pytest.File):
     def __init__(self, fspath, parent=None, config=None, session=None, dowhat=RunNb):

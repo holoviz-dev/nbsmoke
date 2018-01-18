@@ -291,6 +291,11 @@ def test_lintbad(testdir):
     result = testdir.runpytest('--nbsmoke-lint','-v')
     assert result.ret == 1
 
+def test_lintbad_noqa(testdir):
+    testdir.makefile('.ipynb', testing123=_nb%{'the_source':"undefined # noqa: I am too important to check for lint"})
+    result = testdir.runpytest('--nbsmoke-lint','-v')
+    assert result.ret == 0
+    
 def test_it_is_nbfile(testdir):
     testdir.makeini("""
         [pytest]
