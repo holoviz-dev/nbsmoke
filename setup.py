@@ -13,21 +13,18 @@ def read(fname):
     return codecs.open(file_path, encoding='utf-8').read()
 
 
-setup(
+setup_args = dict(
+    # TODO: can't remember why I called it this? pytest/cookiecutter
+    # convention
     name='pytest-nbsmoke',
+    description='Basic notebook checks. Do they run? Do they contain lint?',    
     version=versioneer.get_version(),
-    author='pytest-nbsmoke contributors',
-    license='BSD-3',
     url='https://github.com/ContinuumIO/nbsmoke',
-    description='Basic notebook checks. Do they run? Do they contain lint?',
-    long_description=read('README.rst'),
+    long_description=read('README.rst'),    
+    author='pyviz contributors',
+    author_email = "dev@pyviz.org",
+    license='BSD-3',
     py_modules=['pytest_nbsmoke'],
-    install_requires=['pytest>=3.1.1',
-                      'jupyter_client',
-                      'ipykernel',
-                      'nbformat',
-                      'nbconvert',
-                      'pyflakes'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Framework :: Pytest',
@@ -36,14 +33,27 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
         'License :: OSI Approved :: BSD License',
     ],
+    
+    python_requires = ">=2.7",
+    
+    install_requires=[
+        'pytest >=3.1.1',
+        'jupyter_client',
+        'ipykernel',
+        'nbformat',
+        'nbconvert',
+        'pyflakes'
+    ],
+    
     entry_points={
         'pytest11': [
             'nbsmoke = pytest_nbsmoke',
         ],
     },
 )
+
+if __name__=="__main__":
+    setup(**setup_args)

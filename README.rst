@@ -24,16 +24,6 @@ far as possible, but has not yet been widely tested.
 This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`_'s `Cookiecutter-pytest-plugin`_ template.
 
 
-Requirements
-------------
-
-* ``pytest>=3.1.1``
-* ``jupyter_client``
-* ``ipykernel``
-* ``nbformat``
-* ``nbconvert``
-* ``pyflakes``
-
 
 Installation
 ------------
