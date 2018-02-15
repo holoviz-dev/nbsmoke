@@ -7,9 +7,9 @@
     :alt: See Build Status on AppVeyor
 
 
-==============
-pytest-nbsmoke
-==============
+=======
+nbsmoke
+=======
 
 Basic notebook smoke tests: Do they run ok? Do they contain lint?
 
@@ -28,9 +28,9 @@ This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`
 Installation
 ------------
 
-You can install "pytest-nbsmoke" via `pip`_ from `PyPI`_::
+You can install "nbsmoke" via `pip`_ from `PyPI`_::
 
-    $ pip install pytest-nbsmoke
+    $ pip install nbsmoke
 
 
 Usage
@@ -82,7 +82,7 @@ New release to PyPI: ``git tag -a x.y.z -m "Something about release"
 License
 -------
 
-Distributed under the terms of the `BSD-3`_ license, "pytest-nbsmoke"
+Distributed under the terms of the `BSD-3`_ license, "nbsmoke"
 is free and open source software.
 
 

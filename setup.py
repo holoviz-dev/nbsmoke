@@ -14,9 +14,7 @@ def read(fname):
 
 
 setup_args = dict(
-    # TODO: can't remember why I called it this? pytest/cookiecutter
-    # convention
-    name='pytest-nbsmoke',
+    name='nbsmoke',
     description='Basic notebook checks. Do they run? Do they contain lint?',    
     version=versioneer.get_version(),
     url='https://github.com/ContinuumIO/nbsmoke',
@@ -24,7 +22,7 @@ setup_args = dict(
     author='pyviz contributors',
     author_email = "dev@pyviz.org",
     license='BSD-3',
-    py_modules=['pytest_nbsmoke'],
+    py_modules=['nbsmoke'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Framework :: Pytest',
@@ -50,7 +48,7 @@ setup_args = dict(
     
     entry_points={
         'pytest11': [
-            'nbsmoke = pytest_nbsmoke',
+            'nbsmoke = nbsmoke',
         ],
     },
 )
