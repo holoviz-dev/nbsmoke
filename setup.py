@@ -16,7 +16,7 @@ def read(fname):
 setup_args = dict(
     name='nbsmoke',
     description='Basic notebook checks. Do they run? Do they contain lint?',    
-    version=versioneer.get_version(),
+    version=versioneer.get_version().lstrip('v'), # handle pyviz leading v for tags convention
     url='https://github.com/ContinuumIO/nbsmoke',
     long_description=read('README.rst'),    
     author='pyviz contributors',
