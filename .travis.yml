@@ -59,6 +59,7 @@ jobs:
       - doit install_miniconda
       - export PATH="$HOME/miniconda/bin:$PATH"
       - conda install -y -c pyviz/label/dev -c conda-forge pyct
+      - rm -f .doit.db
       - doit ci_configure_conda
     install:
       - doit build_conda_package --channel conda-forge
