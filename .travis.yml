@@ -4,7 +4,7 @@ language: python
 stages:
   - lint
   - test
-  
+
   # python packages always built for master, but only deployed for a
   # ^v tag
   #
@@ -20,6 +20,7 @@ stages:
 
 jobs:
   include:
+
   - &default
     stage: test
     python: 3.6
@@ -30,12 +31,12 @@ jobs:
       - tox -e $TOX_ENV
 
   - <<: *default
-    python: 2.7
-    env: TOX_ENV=py27
-
-  - <<: *default
     stage: lint
     env: TOX_ENV=flake8
+
+  - <<: *default
+    python: 2.7
+    env: TOX_ENV=py27
 
   - <<: *default
     stage: pypi_package
@@ -52,23 +53,22 @@ jobs:
 
   - &conda_default
     stage: conda_dev_package
-    install:
-      - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-      - bash miniconda.sh -b -p $HOME/miniconda
+    python: 3.6
+    before_install:
+      - pip install pyct
+      - doit install_miniconda
       - export PATH="$HOME/miniconda/bin:$PATH"
-      - conda config --set always_yes yes --set changeps1 no
-      - conda update conda
-      - conda install anaconda-client conda-build
-      - conda build conda.recipe/      
+      - conda install -y -c pyviz/label/dev -c conda-forge pyct
+      - doit ci_configure_conda
+    install:
+      - doit build_conda_package --channel conda-forge
     script:
-      # TODO: need to upload only if package doesn't exist (as e.g. there are cron builds)
-      - anaconda --token $CONDA_UPLOAD_TOKEN upload --user pyviz --label dev `conda build --output conda.recipe`
+      - doit upload_conda_package --token=$CONDA_UPLOAD_TOKEN
 
   - <<: *conda_default
     stage: conda_package
     script:
-      - anaconda --token $CONDA_UPLOAD_TOKEN upload --user pyviz `conda build --output conda.recipe`
-
+      - doit upload_conda_package --token=$CONDA_UPLOAD_TOKEN --label=main
 
 #before_cache:
 #- rm -rf $HOME/.cache/pip/log
