@@ -62,7 +62,7 @@ jobs:
   - <<: *conda_default
     stage: conda_package
     script:
-      - doit upload_conda_package --token=$CONDA_UPLOAD_TOKEN --label=main
+      - doit upload_conda_package --token=$CONDA_UPLOAD_TOKEN --label=main --label=dev
 
 #before_cache:
 #- rm -rf $HOME/.cache/pip/log
