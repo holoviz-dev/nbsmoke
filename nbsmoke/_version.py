@@ -43,7 +43,7 @@ def get_config():
     cfg.style = "pep440-pre"
     cfg.tag_prefix = "v"
     cfg.parentdir_prefix = "nbsmoke-"
-    cfg.versionfile_source = "_version.py"
+    cfg.versionfile_source = "nbsmoke/_version.py"
     cfg.verbose = False
     return cfg
 

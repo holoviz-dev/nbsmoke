@@ -22,7 +22,7 @@ setup_args = dict(
     author='pyviz contributors',
     author_email = "dev@pyviz.org",
     license='BSD-3',
-    py_modules=['nbsmoke'],
+    packages=['nbsmoke'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Framework :: Pytest',
