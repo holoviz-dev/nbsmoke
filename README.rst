@@ -28,10 +28,14 @@ This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`
 Installation
 ------------
 
-You can install "nbsmoke" via `pip`_ from `PyPI`_::
+You can install nbsmoke via `pip`_ from `PyPI`_::
 
     $ pip install nbsmoke
 
+Or you can install nbsmoke via `conda`_ from `anaconda.org`_::
+
+    $ conda install -c pyviz nbsmoke
+    
 
 Usage
 -----
@@ -75,8 +79,8 @@ Contributing
 First, install using ``pip install -e .``. Then run the tests using
 ``tox`` or ``pytest -v tests/``.
 
-New release to PyPI: ``git tag -a x.y.z -m "Something about release"
-&& git push --tags``.
+New release to PyPI and anaconda.org: ``git tag -a vX.Y.Z -m
+"Something about release" && git push --tags``.
 
 
 License
@@ -101,3 +105,5 @@ including a copy of any problematic notebook).
 .. _`tox`: https://tox.readthedocs.io/en/latest/
 .. _`pip`: https://pypi.python.org/pypi/pip/
 .. _`PyPI`: https://pypi.python.org/pypi
+.. _`conda`: https://conda.io/
+.. _`anaconda.org`: https://anaconda.org/
