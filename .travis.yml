@@ -14,7 +14,7 @@ stages:
   - name: pypi_package
     if: (branch = master AND type != pull_request) OR (tag =~ ^v)
   - name: conda_dev_package
-    if: branch = master AND type != pull_request
+    if: (branch = master AND type != pull_request) OR (tag =~ ^v)
   - name: conda_package
     if: tag =~ ^v
 
