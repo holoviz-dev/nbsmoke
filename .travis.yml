@@ -4,10 +4,12 @@ language: python
 stages:
   - lint
   - test
-  - name: conda_package
-    if: branch = master AND type != pull_request
   - name: pypi_package
+    if: (branch = master AND type != pull_request) OR (tag =~ ^v)  
+  - name: conda_dev_package
     if: branch = master AND type != pull_request
+  - name: conda_package
+    if: tag =~ ^v
 
 jobs:
   include:
@@ -41,7 +43,8 @@ jobs:
       password:
         secure: XMvJixww3x1YNIeyZ5KkzUZI1xajlvndluCC5LLFz9ZL5PwOGBojwLsicyfKv2HJkrKV4y2GtZYlkbqPjE1vgg+0/Ckc0rGgDLNtJX6V7WWQFLHBsE6iwQOLC7YQwlrI0rL33lMTS396l78oLXPLkyy1kXb9kZfjhOtborvVocInkCfgMjwgCk38X+YyAJvB7eMbbekOFHEuXRLLikijIYk3cOy04gvxKsJXQmAs+4NnEm1u+EgRy3lrlDCkcJ9ffXETTG9VCgIGUC/sdnS8xkhmJCfaRiMi4icfAayWzjmn3JYcaenTaLDDDbXieibehtusExRjaY0dET/LmCC1xajsjk/xEFejnZcDO1mXN+OLiu0X+JN4Cny8DXQVKn5nQdE7rhXUZ8Hh0SSPVU+r+rgxo9VGsA6QMZjC/Vz5uEVYD9yfVFRTH8YYyHJddBYUZeY5aKATIAQiiC95MoXPAj+CxbCjqU0YIErWnd+VJtfM2AwpXuwU2LO3rbbPDrrSHRaiEqWI2lJrZ7mZVXVhpNjQqrm2E1iiNBEbOFzo7kfp/wBKqrgmjS+r90YZQNZKVVJKl7m5RJ5AqCpWe2C0uxI6xn+mrEYuTF6W6jxhEkklnT6F/rBOcTXlzSUAwIvJTFca9HAeucIPFxkBEDLeUATJa44lpg+PJx0ASeIOHFQ=
 
-  - stage: conda_package
+  - &conda_default
+    stage: conda_dev_package
     install:
       - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
       - bash miniconda.sh -b -p $HOME/miniconda
@@ -49,10 +52,15 @@ jobs:
       - conda config --set always_yes yes --set changeps1 no
       - conda update conda
       - conda install anaconda-client conda-build
+      - conda build conda.recipe/      
     script:
-      - conda build conda.recipe/
       # TODO: need to upload only if package doesn't exist (as e.g. there are cron builds)
       - anaconda --token $CONDA_UPLOAD_TOKEN upload --user pyviz --label dev `conda build --output conda.recipe`
+
+  - <<: *conda_default
+    stage: conda_package
+    script:
+      - anaconda --token $CONDA_UPLOAD_TOKEN upload --user pyviz `conda build --output conda.recipe`
 
 
 #before_cache:
