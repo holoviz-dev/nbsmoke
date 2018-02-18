@@ -72,3 +72,4 @@ target/
 .python-version
 
 *~
+.doit*
