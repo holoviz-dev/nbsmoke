@@ -59,7 +59,7 @@ jobs:
       - conda install -y -c pyviz/label/dev -c conda-forge pyct
       - doit ci_configure_conda
     install:
-      - doit conda_develop_install_alternate
+      - doit conda_develop_install_alternate --channel=conda-forge
     script:
       - doit unit_tests
 
