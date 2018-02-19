@@ -1,9 +1,9 @@
-.. image:: https://travis-ci.org/ContinuumIO/nbsmoke.svg?branch=master
-    :target: https://travis-ci.org/ContinuumIO/nbsmoke
+.. image:: https://travis-ci.org/pyviz/nbsmoke.svg?branch=master
+    :target: https://travis-ci.org/pyviz/nbsmoke
     :alt: See Build Status on Travis CI
 
-.. image:: https://ci.appveyor.com/api/projects/status/sk3qp2w9oovkg4wb/branch/master?svg=true
-    :target: https://ci.appveyor.com/project/ContinuumAnalytics/nbsmoke/branch/master
+.. image:: https://ci.appveyor.com/api/projects/status/p93ot2kmae55pw3o/branch/master?svg=true
+    :target: https://ci.appveyor.com/project/pyviz/nbsmoke/branch/master
     :alt: See Build Status on AppVeyor
 
 
@@ -34,7 +34,7 @@ You can install nbsmoke via `pip`_ from `PyPI`_::
 
 Or you can install nbsmoke via `conda`_ from `anaconda.org`_::
 
-    $ conda install -c pyviz nbsmoke
+    $ conda install -c pyviz/label/dev -c conda-forge nbsmoke
     
 
 Usage
@@ -100,7 +100,7 @@ including a copy of any problematic notebook).
 .. _`@hackebrot`: https://github.com/hackebrot
 .. _`BSD-3`: http://opensource.org/licenses/BSD-3-Clause
 .. _`cookiecutter-pytest-plugin`: https://github.com/pytest-dev/cookiecutter-pytest-plugin
-.. _`file an issue`: https://github.com/ContinuumIO/pytest-nbsmoke/issues
+.. _`file an issue`: https://github.com/pyviz/nbsmoke/issues
 .. _`pytest`: https://github.com/pytest-dev/pytest
 .. _`tox`: https://tox.readthedocs.io/en/latest/
 .. _`pip`: https://pypi.python.org/pypi/pip/

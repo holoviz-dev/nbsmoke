@@ -46,8 +46,7 @@ jobs:
       on:
         tags: true
       user: ceball
-      password:
-        secure: XMvJixww3x1YNIeyZ5KkzUZI1xajlvndluCC5LLFz9ZL5PwOGBojwLsicyfKv2HJkrKV4y2GtZYlkbqPjE1vgg+0/Ckc0rGgDLNtJX6V7WWQFLHBsE6iwQOLC7YQwlrI0rL33lMTS396l78oLXPLkyy1kXb9kZfjhOtborvVocInkCfgMjwgCk38X+YyAJvB7eMbbekOFHEuXRLLikijIYk3cOy04gvxKsJXQmAs+4NnEm1u+EgRy3lrlDCkcJ9ffXETTG9VCgIGUC/sdnS8xkhmJCfaRiMi4icfAayWzjmn3JYcaenTaLDDDbXieibehtusExRjaY0dET/LmCC1xajsjk/xEFejnZcDO1mXN+OLiu0X+JN4Cny8DXQVKn5nQdE7rhXUZ8Hh0SSPVU+r+rgxo9VGsA6QMZjC/Vz5uEVYD9yfVFRTH8YYyHJddBYUZeY5aKATIAQiiC95MoXPAj+CxbCjqU0YIErWnd+VJtfM2AwpXuwU2LO3rbbPDrrSHRaiEqWI2lJrZ7mZVXVhpNjQqrm2E1iiNBEbOFzo7kfp/wBKqrgmjS+r90YZQNZKVVJKl7m5RJ5AqCpWe2C0uxI6xn+mrEYuTF6W6jxhEkklnT6F/rBOcTXlzSUAwIvJTFca9HAeucIPFxkBEDLeUATJa44lpg+PJx0ASeIOHFQ=
+      password: $PYPI_PWD
 
   - &conda_default
     # like a conda-using developer
