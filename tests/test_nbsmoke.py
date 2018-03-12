@@ -205,6 +205,139 @@ _nb2b = u'''
 }
 '''
 
+_nb2c = u'''
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import holoviews as hv\\n",
+    "import os\\n",
+    "from holoviews.operation.datashader import datashade"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%%%%opts HLine (color='red' line_width=2) VLine (color='red', line_width=2)\\n",
+    "%%%%opts RGB [invert_yaxis=True width=400 height=400]\\n",
+    "%time adim = hv.Dimension('A')\\n",
+    "bdim = hv.Dimension('B')\\n",
+    "paths = [os.path.join('data', f) for f in ['a','b']]\\n",
+    "hv.Layout([datashade(hv.Curve(p, kdims=[adim], vdims=[bdim])) for p in paths]).cols(2)"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
+'''
+
+_nb2cbad = u'''
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import holoviews as hv\\n",
+    "import os\\n",
+    "from holoviews.operation.datashader import datashade"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%%%%opts RGB [invert_yaxis=True width=400 height=400]\\n",
+    "%time adim2 = hv.Dimension('A')\\n",
+    "bdim = hv.Dimension('B')\\n",
+    "paths = [os.path.join('data', f) for f in ['a','b']]\\n",
+    "hv.Layout([datashade(hv.Curve(p, kdims=[adim], vdims=[bdim])) for p in paths]).cols(2)"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
+'''
+
+
+_nb3 = u'''
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def f(): return 1\\n",
+    "\\n",
+    "%time z = f()\\n",
+    "z"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
+'''
+
+_nb3bad = u'''
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def f(): return 1\\n",
+    "\\n",
+    "%time z = notexisting()\\n",
+    "z"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
+'''
 
 
 
@@ -264,6 +397,29 @@ def test_lintextra_bad(testdir):
     result = testdir.runpytest('--nbsmoke-lint','-v')
     assert result.ret == 1
 
+def test_lintlinemagics_good(testdir):
+    testdir.makefile('.ipynb', testing123=_nb3)
+    result = testdir.runpytest('--nbsmoke-lint','-v')
+    assert result.ret == 0
+
+# TODO: parameterize nb3 and nb2c so the "bad" versions
+# don't need to exist separately.
+
+def test_lintlinemagics_bad(testdir):
+    testdir.makefile('.ipynb', testing123=_nb3bad)
+    result = testdir.runpytest('--nbsmoke-lint','-v')
+    assert result.ret == 1
+    
+def test_lintlinemagics_with_cell_magics_good(testdir):
+    testdir.makefile('.ipynb', testing123=_nb2c)
+    result = testdir.runpytest('--nbsmoke-lint','-v')
+    assert result.ret == 0
+
+def test_lintlinemagics_with_cell_magics_bad(testdir):
+    testdir.makefile('.ipynb', testing123=_nb2cbad)
+    result = testdir.runpytest('--nbsmoke-lint','-v')
+    assert result.ret == 1
+    
 def test_lintbad(testdir):
     testdir.makefile('.ipynb', testing123=_nb%{'the_source':"1/1 these undefined names are definitely undefined"})
     result = testdir.runpytest('--nbsmoke-lint','-v')

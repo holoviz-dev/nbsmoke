@@ -11,6 +11,7 @@ import io
 import sys
 import contextlib
 import ast # uh oh
+import warnings
 
 from ._version import get_versions
 __version__ = get_versions()['version']
@@ -161,30 +162,60 @@ def _insert_get_ipython(nb):
     # so pyflakes doesn't get confused about magics
     if len(nb['cells']) > 0:
         # the get_ipython() is so pyflakes doesn't complain if no
-        # magics present.        
+        # magics present.
         get_ipython_cell = nbformat.v4.new_code_cell(
             'from IPython import get_ipython\nget_ipython()')
         nb['cells'].insert(0,get_ipython_cell)
 
 
-def insert_ipython_run_cell_magic_cell_content(py):
+####################
+
+# TODO: instead of this hacky custom magics handling, should find and
+# use ipython's own
+
+def _line_magics(line):
+    #line = line.strip()
+    if line.strip().startswith('%%'):
+        magic, content = None, ''
+    elif line.strip().startswith('%'):
+        magic,content = line[1::].split(" ", 1)
+    elif line.strip().startswith('get_ipython().run_line_magic('):
+        magic,content = [x.s for x in ast.parse(line).body[0].value.args]
+    else:
+        content = line
+        magic = None
+
+    if magic in (None,'time','timeit','prun'):
+        return content
+    elif magic in ('opts','output','timer'):
+        # silently ignore
+        return line
+    else:
+        # unknown
+        warnings.warn("nbsmoke can't process the following line magic and has skipped it:\n%s\nPlease file an issue at github.com/pyviz/nbsmoke/issues if it should be supported (i.e. included or silently ignored)"%line)
+        return line
+
+
+def insert_ipython_magic_content(py):
     # assuming cell magic always looks like this:
     #   'get_ipython().run_cell_magic(\'x\', \'y\', "z")'
     # where x is the %% command, y is the rest of the line, and z is
-    # the cell code, insert all non-%-starting lines from z back into
+    # the cell code, insert all lines from z back into
     # the source for pyflakes to look at. This is more of a proof of
     # concept hack than something guaranteed to work...
     newlines = []
     lines = py.split('\n')
     for line in lines:
         if line.startswith('get_ipython().run_cell_magic('):
+            # TODO: test with prun
             content = ast.parse(line).body[0].value.args[2].s.splitlines()
             for l in content:
-                if not l.startswith('%'):
-                    newlines.append(l)
+                newlines.append(_line_magics(l))
         else:
-            newlines.append(line)
+            newlines.append(_line_magics(line))
     return "\n".join(newlines)
+
+####################
 
 
 class LintNb(pytest.Item):
@@ -193,13 +224,13 @@ class LintNb(pytest.Item):
             nb = nbformat.read(nbfile, as_version=4)
             _insert_get_ipython(nb)
             py, resources = nbconvert.PythonExporter().from_notebook_node(nb)
-            py = insert_ipython_run_cell_magic_cell_content(py)
+            py = insert_ipython_magic_content(py)
             if sys.version_info[0]==2:
                 # notebooks will start with "coding: utf-8", but py already unicode
                 py = py.encode('utf8')
             if flake_check(py,self.name) != 0:
                 raise AssertionError
-            
+
 
 class IPyNbFile(pytest.File):
     def __init__(self, fspath, parent=None, config=None, session=None, dowhat=RunNb):
