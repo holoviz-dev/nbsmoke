@@ -174,20 +174,37 @@ def _insert_get_ipython(nb):
 # use ipython's own
 
 def _line_magics(line):
+    # magic=None means magic but don't process - omit line
+    # magic=True means magic but don't need to process - include line as is
+    # magic=False means no magic - include line as is
+    # otherwise magic is something to process
+    
     if line.strip().startswith('%%'):
+        # TODO: we only process the first cell magics (part of
+        # assumption that cell magics don't use names from python
         magic, content = None, ''
     elif line.strip().startswith('%'):
-        magic,content = line[1::].split(" ", 1)
+        bits = line[1::].split(" ", 1)
+        if len(bits) == 1: # have never tested this path?
+            magic,content = True, line
+        else:
+            magic,content = bits
     elif line.strip().startswith('get_ipython().run_line_magic('):
         magic,content = [x.s for x in ast.parse(line).body[0].value.args]
+    # py2
     elif line.strip().startswith('get_ipython().magic('):
-        # using ast unnecessary, just copied from cell magics        
-        magic, content = ast.parse(line).body[0].value.args[0].s.split(" ", 1)
+        # using ast probably unnecessary, just copy/pasted from cell magics
+        bits = ast.parse(line).body[0].value.args[0].s.split(" ", 1)
+        if len(bits) == 1:
+            magic,content = True, line
+        else:
+            magic, content = ast.parse(line).body[0].value.args[0].s.split(" ", 1)
     else:
-        content = line
-        magic = None
+        magic, content = False, line
 
-    if magic in (None,'time','timeit','prun'):
+    if magic in (None,False,True):
+        return content
+    elif magic in ('time','timeit','prun'):
         return content
     elif magic in ('opts','output','timer'):
         # silently ignore
@@ -199,12 +216,18 @@ def _line_magics(line):
 
 
 def insert_ipython_magic_content(py):
-    # assuming cell magic always looks like this:
+    # Assuming cell magic always looks like this:
     #   'get_ipython().run_cell_magic(\'x\', \'y\', "z")'
     # where x is the %% command, y is the rest of the line, and z is
     # the cell code, insert all lines from z back into
-    # the source for pyflakes to look at. This is more of a proof of
-    # concept hack than something guaranteed to work...
+    # the source for pyflakes to look at.
+    #
+    # Also, assumes cell magics don't use names from the python, which
+    # probably isn't true (i.e. could probably get spurious ununsed
+    # import flakes)
+    #
+    # This is more of a proof of concept hack than something
+    # guaranteed to work...
     newlines = []
     lines = py.split('\n')
     for line in lines:
