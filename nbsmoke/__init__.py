@@ -174,13 +174,15 @@ def _insert_get_ipython(nb):
 # use ipython's own
 
 def _line_magics(line):
-    #line = line.strip()
     if line.strip().startswith('%%'):
         magic, content = None, ''
     elif line.strip().startswith('%'):
         magic,content = line[1::].split(" ", 1)
     elif line.strip().startswith('get_ipython().run_line_magic('):
         magic,content = [x.s for x in ast.parse(line).body[0].value.args]
+    elif line.strip().startswith('get_ipython().magic('):
+        # using ast unnecessary, just copied from cell magics        
+        magic, content = ast.parse(line).body[0].value.args[0].s.split(" ", 1)
     else:
         content = line
         magic = None
