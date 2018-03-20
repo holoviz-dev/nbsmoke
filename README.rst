@@ -72,7 +72,40 @@ configuration in setup.cfg, pytest.ini, or tox.ini::
     # defaults to ``^.*\.ipynb``
     it_is_nb_file = ^.*\.something$
 
+nbsmoke supports ``# noqa`` comments to mark that something
+should be ignored during lint checking.
 
+
+What's the point?
+-----------------
+
+Although more sophisticated testing of notebooks is possible (e.g. see
+nbval), just checking that notebooks run from start to finish without
+error in a fresh kernel (or on a neutral CI service) can be useful
+during development. Practical experience of working on several
+projects with notebooks confirms this, but that's all the evidence I
+have.
+
+Checking notebooks for lint might seem trivial/pointless, but it
+frequently uncovers unused names (typically unused imports). It's also
+quite common to find python 2 vs 3 problems, and sometimes undefined
+names - in a way that's faster than running the notebook (over
+multiple versions of python).
+
+Unused imports/names themselves might seem trivial, but they can
+hinder understanding of a notebook by readers, or add dependencies
+that are not required.
+
+Using ``# noqa: explanation`` in a notebook might seem like overkill,
+but the intention is to encourage unavoidable/desirable 'mysterious
+imports' to be clarified. E.g. if you're importing something for its
+side effects, it's very helpful to inform the reader of that.
+
+Pyflakes is used as the underlying linter because "Pyflakes makes a
+simple promise: it will never complain about style, and it will try
+very, very hard to never emit false positives."
+
+    
 Contributing
 ------------
 
