@@ -190,11 +190,11 @@ def _line_magics(line):
         else:
             magic,content = bits
     elif line.strip().startswith('get_ipython().run_line_magic('):
-        magic,content = [x.s for x in ast.parse(line).body[0].value.args]
+        magic,content = [x.s for x in ast.parse(line.strip()).body[0].value.args]
     # py2
     elif line.strip().startswith('get_ipython().magic('):
         # using ast probably unnecessary, just copy/pasted from cell magics
-        bits = ast.parse(line).body[0].value.args[0].s.split(" ", 1)
+        bits = ast.parse(line.strip()).body[0].value.args[0].s.split(" ", 1)
         if len(bits) == 1:
             magic,content = True, line
         else:
