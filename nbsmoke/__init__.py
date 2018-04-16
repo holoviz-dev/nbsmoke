@@ -198,6 +198,7 @@ def _line_magics(line):
         if len(bits) == 1:
             magic,content = True, line
         else:
+            # TODO: add test of this line; see ds nyc_taxi-nongeo.ipynb w/ py27
             magic, content = ast.parse(line.strip()).body[0].value.args[0].s.split(" ", 1)
     else:
         magic, content = False, line
