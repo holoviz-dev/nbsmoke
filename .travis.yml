@@ -53,9 +53,9 @@ jobs:
     stage: conda_test
     python: 3.6
     before_install:
-      - pip install pyct && doit install_miniconda && rm -f .doit.db
+      - pip install "pyct <0.2.1" && doit install_miniconda && rm -f .doit.db
       - export PATH="$HOME/miniconda/bin:$PATH"
-      - conda install -y -c pyviz/label/dev -c conda-forge pyct
+      - conda install -y -c pyviz/label/dev -c conda-forge "pyct <0.2.1"
       - doit ci_configure_conda
     install:
       - doit conda_develop_install_alternate --channel=conda-forge
