@@ -198,7 +198,7 @@ def _line_magics(line):
         if len(bits) == 1:
             magic,content = True, line
         else:
-            magic, content = ast.parse(line).body[0].value.args[0].s.split(" ", 1)
+            magic, content = ast.parse(line.strip()).body[0].value.args[0].s.split(" ", 1)
     else:
         magic, content = False, line
 
