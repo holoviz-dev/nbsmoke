@@ -1,1 +1,2 @@
 include nbsmoke/.version
+include version.py
