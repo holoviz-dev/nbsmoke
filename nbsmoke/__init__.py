@@ -19,9 +19,9 @@ try:
     __version__ = str(Version(fpath=__file__,archive_commit="$Format:%h$",reponame="nbsmoke"))
     del Version
 except:
-    import os, json
+    import json
     __version__ = json.load(open(os.path.join(os.path.dirname(__file__),'.version'),'r'))['version_string']
-    del os,json
+    del json
 
 ######################################################################
 ######################################################################
