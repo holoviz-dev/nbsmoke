@@ -1,3 +1,5 @@
+# TODO: this has only been partially updated to use pyct
+
 sudo: false
 language: python
 
@@ -5,12 +7,14 @@ stages:
   - lint
   - test
   - conda_test
-  - name: pypi_package
-    if: (branch = master AND type != pull_request) OR (tag =~ ^v)
+  - name: pip_dev_package
+    if: tag =~ ^v(\d+|\.)*[a-z]\d*$
+  - name: pip_package
+    if: tag =~ ^v(\d+|\.)*[^a-z]\d*$
   - name: conda_dev_package
-    if: (branch = master AND type != pull_request)
+    if: tag =~ ^v(\d+|\.)*[a-z]\d*$
   - name: conda_package
-    if: tag =~ ^v
+    if: tag =~ ^v(\d+|\.)*[^a-z]\d*$
 
 jobs:
   include:
@@ -37,11 +41,24 @@ jobs:
     env: TOX_ENV=dev
 
   - <<: *default
-    stage: pypi_package
+    stage: pip_package
     install: true
     script: true
     deploy:
       provider: pypi
+      distributions: "sdist bdist_wheel"
+      on:
+        tags: true
+      user: ceball
+      password: $PYPI_PWD
+
+  - <<: *default
+    stage: pip_dev_package
+    install: true
+    script: true
+    deploy:
+      provider: pypi
+      server: https://testpypi.python.org/pypi
       distributions: "sdist bdist_wheel"
       on:
         tags: true
@@ -79,9 +96,3 @@ jobs:
       - doit build_conda_package --channel conda-forge    
     script:
       - doit upload_conda_package --token=$CONDA_UPLOAD_TOKEN --label=main --label=dev
-
-#before_cache:
-#- rm -rf $HOME/.cache/pip/log
-#cache:
-#  directories:
-#  - "$HOME/.cache/pip"
