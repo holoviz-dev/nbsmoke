@@ -19,28 +19,28 @@ def test_help_message(testdir):
     ])
 
 
-def test_cell_timeout_ini_setting(testdir):
+def test_nbsmoke_cell_timeout_ini_setting(testdir):
     testdir.makeini("""
         [pytest]
-        cell_timeout = 123
+        nbsmoke_cell_timeout = 123
     """)
 
     testdir.makepyfile("""
         import pytest
 
         @pytest.fixture
-        def cell_timeout(request):
-            return request.config.getini('cell_timeout')
+        def nbsmoke_cell_timeout(request):
+            return request.config.getini('nbsmoke_cell_timeout')
 
-        def test_cell_timeout(cell_timeout):
-            assert int(cell_timeout) == 123
+        def test_nbsmoke_cell_timeout(nbsmoke_cell_timeout):
+            assert int(nbsmoke_cell_timeout) == 123
     """)
 
     result = testdir.runpytest('-v')
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines([
-        '*::test_cell_timeout PASSED*',
+        '*::test_nbsmoke_cell_timeout PASSED*',
     ])
 
     # make sure that that we get a '0' exit code for the testsuite
@@ -440,11 +440,12 @@ def test_it_is_nbfile(testdir):
     result = testdir.runpytest('--nbsmoke-run','-v')
     assert result.ret == 5
 
+# TODO: missing test of --ignore-nbsmoke-skip-run
 def test_skip_run(testdir):
     testdir.makeini("""
         [pytest]
-        skip_run = ^.*skipme\.ipynb$
-                   ^.*skipmetoo.*$
+        nbsmoke_skip_run = ^.*skipme\.ipynb$
+                           ^.*skipmetoo.*$
     """)
 
     testdir.makefile('.ipynb', skipme=_nb%{'the_source':"1/0"})

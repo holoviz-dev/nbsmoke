@@ -110,14 +110,24 @@ def pytest_addoption(parser):
     group.addoption(
         '--store-html',
         action="store",
+        # ?? store_true, right? TODO
         dest='store_html',
         default='',
         help="When running, store rendered-to-html notebooks in the supplied path.")
 
-    parser.addini('cell_timeout', 'nbconvert cell timeout')
-    parser.addini('it_is_nb_file', 're to determine whether file is notebook')
-    parser.addini('skip_run', 're to skip (multi-line; one pattern per line)')
+    parser.addini('nbsmoke_cell_timeout', "nbsmoke's nbconvert cell timeout")
 
+    ####
+    # TODO: hacks to work around pyviz team desire to not use pytest's markers
+    parser.addini('nbsmoke_skip_run', 're to skip (multi-line; one pattern per line)')
+    group.addoption(
+        '--ignore-nbsmoke-skip-run',
+        action="store_true",
+        help="Ignore any skip list in the ini file (allows to run all nbs if desired)")
+    ####
+    
+    # TODO: remove/rename/see pytest python_files
+    parser.addini('it_is_nb_file', 're to determine whether file is notebook')
 
 @contextlib.contextmanager
 def cwd(d):
@@ -136,7 +146,7 @@ class RunNb(pytest.Item):
             notebook = nbformat.read(nb, as_version=4)
 
             # TODO: which kernel? run in pytest's or use new one (make it option)
-            _timeout = self.parent.parent.config.getini('cell_timeout')
+            _timeout = self.parent.parent.config.getini('nbsmoke_cell_timeout')
             kwargs = dict(timeout=int(_timeout) if _timeout!='' else 300,
                           allow_errors=False,
                           # or sys.version_info[1] ?
@@ -156,8 +166,8 @@ class RunNb(pytest.Item):
                     f.write(html)
 
     def _skip(self):
-        _skip_patterns = self.parent.parent.config.getini('skip_run')
-        if _skip_patterns != '':
+        _skip_patterns = self.parent.parent.config.getini('nbsmoke_skip_run')
+        if _skip_patterns != '' and not self.parent.parent.config.option.ignore_nbsmoke_skip_run:
             skip_patterns = _skip_patterns.splitlines()
             for pattern in skip_patterns:
                 if re.match(pattern,self.name,re.IGNORECASE):

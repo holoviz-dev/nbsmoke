@@ -40,33 +40,37 @@ Or you can install nbsmoke via `conda`_ from `anaconda.org`_::
 Usage
 -----
 
-Check all notebooks in examples/ run without errors::
+Check all notebooks run without errors::
 
-    $ pytest --nbsmoke-run examples/
+    $ pytest --nbsmoke-run
 
-Check all notebooks in examples/ run without errors, and store html to
-look at afterwards::
+Check all notebooks run without errors, and store html to look at
+afterwards::
 
-    $ pytest --nbsmoke-run --store-html=/scratch examples/
+    $ pytest --nbsmoke-run --store-html=/scratch
 
-Lint check notebooks in examples/::
+Lint check notebooks::
 
-    $ pytest --nbsmoke-lint notebooks/
+    $ pytest --nbsmoke-lint
 
 Instead of all files in a directory, you can specify a list e.g.::
 
     $ pytest --nbsmoke-run notebooks/Untitled*.ipynb
 
+If you want to restrict pytest to running only your notebook tests, use `-k`, e.g.::
+
+    $ pytest --nbsmoke-run -k ".ipynb"
+    
 Additional options are available by standard pytest 'ini'
 configuration in setup.cfg, pytest.ini, or tox.ini::
 
     [pytest]
     # when running, seconds allowed per cell (see nbconvert timeout)
-    cell_timeout = 600
+    nbsmoke_cell_timeout = 600
 
     # notebooks to skip running; one case insensitive re to match per line
-    skip_run = ^.*skipme\.ipynb$
-               ^.*skipmetoo.*$
+    nbsmoke_skip_run = ^.*skipme\.ipynb$
+                       ^.*skipmetoo.*$
 
     # case insensitive re to match for file to be considered notebook;
     # defaults to ``^.*\.ipynb``
@@ -74,6 +78,10 @@ configuration in setup.cfg, pytest.ini, or tox.ini::
 
 nbsmoke supports ``# noqa`` comments to mark that something
 should be ignored during lint checking.
+
+The ``nbsmoke_skip_run`` list in a project's config can be ignored by
+passing ``--ignore-nbsmoke-skip-run`` (useful if sometimes you want to
+run all notebooks).
 
 
 What's the point?
