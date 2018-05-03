@@ -58,7 +58,7 @@ jobs:
     script: true
     deploy:
       provider: pypi
-      server: https://testpypi.python.org/pypi
+      server: https://testpypi.python.org/legacy
       distributions: "sdist bdist_wheel"
       on:
         tags: true
