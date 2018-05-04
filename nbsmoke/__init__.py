@@ -170,7 +170,7 @@ class RunNb(pytest.Item):
         if _skip_patterns != '' and not self.parent.parent.config.option.ignore_nbsmoke_skip_run:
             skip_patterns = _skip_patterns.splitlines()
             for pattern in skip_patterns:
-                if re.match(pattern,self.name,re.IGNORECASE):
+                if re.match(pattern,self.nodeid.split("::")[0],re.IGNORECASE):
                     pytest.skip()
 
 
