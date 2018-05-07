@@ -44,7 +44,9 @@ setup_args = dict(
         'ipykernel',
         'nbformat',
         'nbconvert',
-        'pyflakes'
+        'pyflakes',
+        'requests',
+        'beautifulsoup4'
     ],
     
     entry_points={

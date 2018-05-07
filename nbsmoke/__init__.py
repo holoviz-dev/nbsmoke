@@ -108,6 +108,13 @@ def pytest_addoption(parser):
         help="Lint check notebooks using flake8")
 
     group.addoption(
+        '--nbsmoke-verify',
+        action="store_true",
+        help="Verify notebooks")
+
+    
+
+    group.addoption(
         '--store-html',
         action="store",
         # ?? store_true, right? TODO
@@ -137,6 +144,114 @@ def cwd(d):
         yield
     finally:
         os.chdir(orig)
+
+###################################################
+# quickly copied in code from datashader examples/nb
+# (which itself came from bokeh?). Need to check it
+# works as expected. Takes a while to run so must be
+# doing something :)
+
+import requests
+from bs4 import BeautifulSoup
+
+def export_as_html(filename):
+    html_exporter = nbconvert.HTMLExporter()
+    html_exporter.template_file = 'basic'
+    body, _ = html_exporter.from_filename(filename)
+    return body
+
+
+def export_as_python(filename):
+    py_exporter = nbconvert.PythonExporter()
+    output, _ = py_exporter.from_filename(filename)
+    return output
+
+
+def module_exists(name):
+    try:
+        __import__(name)
+    except ImportError:
+        return False
+    else:
+        return True
+
+
+def url_exists(url):
+    headers = {'User-Agent': 'Mozilla/5.0'}  # dummy user agent for security filters
+    response = requests.head(url, headers=headers)
+    if not response.ok:
+        response = requests.get(url, headers=headers)
+    return response.ok
+
+
+def replace_all(src, dst, needle, replacement):
+    lines = []
+    with open(src) as f:
+        for line in f.readlines():
+            lines.append(re.sub(needle, replacement, line))
+    with open(dst, 'w') as f:
+        for line in lines:
+            f.write(line)
+
+def check_modules(notebook):
+    class ModuleReader(ast.NodeVisitor):
+        def __init__(self):
+            self.imports = set()
+
+        def generic_visit(self, node):
+            ast.NodeVisitor.generic_visit(self, node)
+            return list(self.imports)
+
+        def visit_Import(self, node):
+            for alias in node.names:
+                self.imports.add(alias.name)
+
+        def visit_ImportFrom(self, node):
+            self.imports.add(node.module)
+
+    def get_ipython_modules(s):
+        root = ast.parse(s)
+        return ModuleReader().visit(root)
+
+    bad_modules = set()
+
+    for module in get_ipython_modules(export_as_python(notebook)):
+        m = re.sub(r'\..*', '', module) if '.' in module else module
+        if not module_exists(m):
+            bad_modules.add(m)
+
+    return bad_modules
+
+
+def check_urls(notebook, name, attribute):
+    REGEX_URL = re.compile('^(http|https):.+')
+
+    bad_urls = set()
+
+    html = export_as_html(notebook)
+    soup = BeautifulSoup(html, 'html.parser')
+    for tag in soup.find_all(name):
+        url = tag.get(attribute)
+        if REGEX_URL.match(url) and not url_exists(url):
+            bad_urls.add(url)
+
+    return bad_urls
+
+
+
+class VerifyNb(pytest.Item):
+    def runtest(self):
+        filename = self.name
+        
+        bad_modules = check_modules(filename)
+        bad_links = check_urls(filename, name='a', attribute='href')
+        bad_images = check_urls(filename, name='img', attribute='src')
+
+        if bad_modules or bad_links or bad_images:
+            warnings.warn("%s:\n%invalid modules: %s\nbad links: %s\nbad images: %s\n"%(filename,bad_modules,bad_links,bad_images))
+        
+
+###################################################
 
 
 class RunNb(pytest.Item):
@@ -291,11 +406,14 @@ def pytest_collect_file(path, parent):
         #"^((?!\.nbval).)*\.ipynb$"
         it_is_nb_file = "^.*\.ipynb"
     if re.match(it_is_nb_file,path.strpath,re.IGNORECASE):
-        if opt.nbsmoke_run or opt.nbsmoke_lint:
+        if opt.nbsmoke_run or opt.nbsmoke_lint or opt.nbsmoke_verify:
             # TODO express via the options system if you ever figure it out
-            assert opt.nbsmoke_run ^ opt.nbsmoke_lint
+            # Hmm, should be able to do all - clean up!
+            assert (opt.nbsmoke_run ^ opt.nbsmoke_lint) ^ opt.nbsmoke_verify
             if opt.nbsmoke_run:
                 dowhat = RunNb
             elif opt.nbsmoke_lint:
                 dowhat = LintNb
+            elif opt.nbsmoke_verify:
+                dowhat = VerifyNb
             return IPyNbFile(path, parent, dowhat=dowhat)
