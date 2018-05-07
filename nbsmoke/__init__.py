@@ -12,7 +12,7 @@ import sys
 import contextlib
 import ast # uh oh
 import warnings
-
+import traceback
 
 try:
     from version import Version
@@ -146,12 +146,15 @@ def cwd(d):
         os.chdir(orig)
 
 ###################################################
-# quickly copied in code from datashader examples/nb
-# (which itself came from bokeh?). Need to check it
-# works as expected. Takes a while to run so must be
-# doing something :)
+# quickly copied in code from datashader examples/nb (which itself
+# came from bokeh?). Need to check it works as expected. Takes a while
+# to run so must be doing something :) But fails to run properly for
+# various projects other than datashader (e.g. for geoviews, gives
+# spurious errors about notebook syntax, complains that
+# https://www.earthsystemcog.org/projects/esmf/regridding is a bad link).
 
-import requests
+
+import requests, requests.exceptions
 from bs4 import BeautifulSoup
 
 def export_as_html(filename):
@@ -244,11 +247,15 @@ class VerifyNb(pytest.Item):
         filename = self.name
         
         bad_modules = check_modules(filename)
-        bad_links = check_urls(filename, name='a', attribute='href')
+        try:
+            bad_links = check_urls(filename, name='a', attribute='href')
+        except requests.exceptions.ConnectionError:
+            bad_links = traceback.format_exc(1)
+            
         bad_images = check_urls(filename, name='img', attribute='src')
 
         if bad_modules or bad_links or bad_images:
-            warnings.warn("%s:\n%invalid modules: %s\nbad links: %s\nbad images: %s\n"%(filename,bad_modules,bad_links,bad_images))
+            warnings.warn("%s:\n***** invalid modules: %s\n\n***** bad links: %s\n\n***** bad images: %s\n\n"%(filename,bad_modules,bad_links,bad_images) + "-"*20)
         
 
 ###################################################
