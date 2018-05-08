@@ -163,11 +163,15 @@ def export_as_html(filename):
     body, _ = html_exporter.from_filename(filename)
     return body
 
-
 def export_as_python(filename):
-    py_exporter = nbconvert.PythonExporter()
-    output, _ = py_exporter.from_filename(filename)
-    return output
+    with io.open(filename,encoding='utf8') as nbfile:
+        nb = nbformat.read(nbfile, as_version=4)
+        output, _ = nbconvert.PythonExporter().from_notebook_node(nb)
+        if sys.version_info[0]==2:
+            # notebooks will start with "coding: utf-8", but output already unicode
+            # (alternative hack would be to find the coding line and remove it)
+            output = output.encode('utf8')
+        return output
 
 
 def module_exists(name):
@@ -186,15 +190,6 @@ def url_exists(url):
         response = requests.get(url, headers=headers)
     return response.ok
 
-
-def replace_all(src, dst, needle, replacement):
-    lines = []
-    with open(src) as f:
-        for line in f.readlines():
-            lines.append(re.sub(needle, replacement, line))
-    with open(dst, 'w') as f:
-        for line in lines:
-            f.write(line)
 
 def check_modules(notebook):
     class ModuleReader(ast.NodeVisitor):
