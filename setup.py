@@ -30,7 +30,7 @@ setup_args = dict(
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Testing',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
         'License :: OSI Approved :: BSD License',

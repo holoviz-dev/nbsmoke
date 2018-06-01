@@ -1,2 +1,3 @@
+include LICENSE
 include nbsmoke/.version
 include version.py
