@@ -105,9 +105,11 @@ hinder understanding of a notebook by readers, or add dependencies
 that are not required.
 
 Using ``# noqa: explanation`` in a notebook might seem like overkill,
-but the intention is to encourage unavoidable/desirable 'mysterious
-imports' to be clarified. E.g. if you're importing something for its
-side effects, it's very helpful to inform the reader of that.
+but the intention is to at least force 'mysterious imports' to be
+clarified (if they are necessary at all, which ideally they shouldn't
+be). E.g. if you're importing something for its side effects, it's
+very helpful to inform the reader of that, and the ugly/strange ``#
+noqa`` should help remind you to fix the underlying problem...
 
 Pyflakes is used as the underlying linter because "Pyflakes makes a
 simple promise: it will never complain about style, and it will try
