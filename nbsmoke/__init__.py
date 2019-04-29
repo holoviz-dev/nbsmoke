@@ -26,15 +26,25 @@ except:
 ######################################################################
 ######################################################################
 
-# This section is adding "# noqa" support to pyflakes. It's not
-# perfect (e.g. what if someone has "# noqa" in some string). Could
-# consider switching to flake8, but it's probably too complex to use
-# for notebooks.
+# Copied out of pyflakes, except with additions as noted.
 
 import pyflakes.reporter, pyflakes.checker
 import _ast
 
-def flake_check(codeString, filename, reporter=None):
+
+def flake_check(codeString, filename, reporter=None, debug=False):
+    ####
+    # nbsmoke addition: debug parameter above; allow to debug ipynb
+    # linting
+    if debug:
+        # should i use a temp file instead?
+        fn = os.path.splitext(filename)[0]+".nbsmoke-debug.py"
+        with open(fn,'w') as df:
+            df.write(codeString)
+    else:
+        fn = "pass --nbsmoke-lint-debug"
+    ####
+
     if reporter is None:
         reporter = pyflakes.reporter._makeDefaultReporter()
     # First, compile into an AST and handle syntax errors.
@@ -66,25 +76,39 @@ def flake_check(codeString, filename, reporter=None):
             reporter.unexpectedError(filename, 'problem decoding source')
         else:
             reporter.syntaxError(filename, msg, lineno, offset, text)
-        return 1
+        ####
+        # nbsmoke addition: (see final 'return' in this fn)
+        return {'status': 1,
+                'messages':["Error - see captured stderr, below."],
+                'source': fn}
+        ####
+
     except Exception:
         reporter.unexpectedError(filename, 'problem decoding source')
-        return 1
+        ####
+        # nbsmoke addition: (see final 'return' in this fn)
+        return {'status': 1,
+                'messages':["Error - see captured stderr, below."],
+                'source': fn}
+        ####
     # Okay, it's syntactically valid.  Now check it.
     w = pyflakes.checker.Checker(tree, filename)
 
-    ##########################
-    ## addition to pyflakes ##
+    ####
+    # nbsmoke addition: hack to support '# noqa' in ipynb
     NOQA = re.compile('# noqa', re.IGNORECASE)
     noqa_lines = [i+1 for i,l in enumerate(codeString.splitlines()) if NOQA.search(l)]
     w.messages[:] = [m for m in w.messages if m.lineno not in noqa_lines]
-    ##########################
+    ####
 
     w.messages.sort(key=lambda m: m.lineno)
-    for warning in w.messages:
-        reporter.flake(warning)
-    return len(w.messages)
 
+    ####
+    # nbsmoke addition: return more info
+    return {'status':len(w.messages),
+            'messages':[("line %s col %s: "%(msg.lineno,msg.col))+msg.message%msg.message_args for msg in w.messages],
+            'source': fn}
+    ####
 
 ######################################################################
 ######################################################################
@@ -106,6 +130,16 @@ def pytest_addoption(parser):
         '--nbsmoke-lint',
         action="store_true",
         help="Lint check notebooks using flake8")
+
+    group.addoption(
+        '--nbsmoke-lint-debug',
+        action="store_true",
+        help="Write out copy of python script resulting from conversion of ipynb")
+
+    group.addoption(
+        '--nbsmoke-lint-onlywarn',
+        action="store_true",
+        help="Flake errors will only appear as warnings")
 
     group.addoption(
         '--nbsmoke-verify',
@@ -376,8 +410,19 @@ def insert_ipython_magic_content(py):
 
 ####################
 
+class NBLintError(Exception):
+    pass
+
 
 class LintNb(pytest.Item):
+
+    def repr_failure(self, excinfo):
+        if excinfo.errisinstance(NBLintError):
+            return excinfo.value.args[0]
+        else:
+            return super(LintNb, self).repr_failure(excinfo)
+
+
     def runtest(self):
         with io.open(self.name,encoding='utf8') as nbfile:
             nb = nbformat.read(nbfile, as_version=4)
@@ -387,9 +432,15 @@ class LintNb(pytest.Item):
             if sys.version_info[0]==2:
                 # notebooks will start with "coding: utf-8", but py already unicode
                 py = py.encode('utf8')
-            if flake_check(py,self.name) != 0:
-                raise AssertionError
-
+            flake_result = flake_check(py,self.name, debug=self.config.option.nbsmoke_lint_debug)
+            if flake_result['status'] != 0:
+                msg = "%s\n"%self.name
+                msg += "\n".join(flake_result['messages'])
+                msg += "\n"+"To see python source that was flake checked: %s"%flake_result['source']
+                if self.config.option.nbsmoke_lint_onlywarn:
+                    warnings.warn("Flakes detected:\n"+msg)
+                else:
+                    raise NBLintError(msg)
 
 class IPyNbFile(pytest.File):
     def __init__(self, fspath, parent=None, config=None, session=None, dowhat=RunNb):
