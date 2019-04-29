@@ -291,6 +291,10 @@ class VerifyNb(pytest.Item):
 
 
 class RunNb(pytest.Item):
+
+    def repr_failure(self, excinfo):
+        return excinfo.exconly(True)
+
     def runtest(self):
         self._skip()
         with io.open(self.name,encoding='utf8') as nb:
