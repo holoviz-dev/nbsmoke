@@ -4,6 +4,7 @@ import os
 import io
 import sys
 import shutil
+import pytest
 
 
 def test_help_message(testdir):
@@ -359,6 +360,7 @@ def test_runbad(testdir):
     result = testdir.runpytest('--nbsmoke-run','-v')
     assert result.ret == 1
 
+@pytest.mark.skipif(sys.version_info[0]==2, reason="html storing not supported for python 2")
 def test_rungood_html(testdir):
     testdir.makefile('.ipynb', testing123=_nb%{'the_source':"42"})
 
@@ -371,8 +373,7 @@ def test_rungood_html(testdir):
     # test that html has happened
     targets = [
         "<pre>42</pre>",
-                                               # note: this is really what happens in a python2 notebook
-        "<pre>&#39;中国&#39;</pre>" if sys.version_info[0]==3 else r"<pre>u&#39;\u4e2d\u56fd&#39;</pre>"]
+        "<pre>&#39;中国&#39;</pre>"]
     answer = [None,None]
     x = os.path.join(testdir.tmpdir.strpath,'testing123.ipynb.html')
     with io.open(x,encoding='utf8') as f:
@@ -409,7 +410,7 @@ def test_lintlinemagics_bad(testdir):
     testdir.makefile('.ipynb', testing123=_nb3bad)
     result = testdir.runpytest('--nbsmoke-lint','-v')
     assert result.ret == 1
-    
+
 def test_lintlinemagics_with_cell_magics_good(testdir):
     testdir.makefile('.ipynb', testing123=_nb2c)
     result = testdir.runpytest('--nbsmoke-lint','-v')
@@ -419,7 +420,7 @@ def test_lintlinemagics_with_cell_magics_bad(testdir):
     testdir.makefile('.ipynb', testing123=_nb2cbad)
     result = testdir.runpytest('--nbsmoke-lint','-v')
     assert result.ret == 1
-    
+
 def test_lintbad(testdir):
     testdir.makefile('.ipynb', testing123=_nb%{'the_source':"1/1 these undefined names are definitely undefined"})
     result = testdir.runpytest('--nbsmoke-lint','-v')
@@ -429,7 +430,7 @@ def test_lintbad_noqa(testdir):
     testdir.makefile('.ipynb', testing123=_nb%{'the_source':"undefined # noqa: I am too important to check for lint"})
     result = testdir.runpytest('--nbsmoke-lint','-v')
     assert result.ret == 0
-    
+
 def test_it_is_nbfile(testdir):
     testdir.makeini("""
         [pytest]
