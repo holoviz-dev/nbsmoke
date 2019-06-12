@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 from . import nb_basic
 
 def test_lint_good(testdir):
@@ -63,5 +65,7 @@ def test_lint_bad_debug(testdir):
     assert outcomes['failed'] == 1
     result.stdout.re_match_lines_random(
         [".*undefined name 'undefined_name'.*",
-         ".*To see python source that was checked by pyflakes.*nbsmoke-debug-postmagicprocess.py$",
-         ".*To see python source before magics were handled by nbsmoke.*nbsmoke-debug-premagicprocess.py$"])
+         ".*To see python source that was checked by pyflakes.*testing123.nbsmoke-debug-postmagicprocess.py$",
+         ".*To see python source before magics were handled by nbsmoke.*testing123.nbsmoke-debug-premagicprocess.py$"])
+    assert os.path.isfile("testing123.nbsmoke-debug-premagicprocess.py")
+    assert os.path.isfile("testing123.nbsmoke-debug-postmagicprocess.py")
