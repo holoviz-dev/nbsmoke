@@ -223,10 +223,12 @@ class LineMagic(_Magic):
     """line magic that was converted to fn by nbconvert"""
     start = 'get_ipython().run_line_magic('
 
+class Py2LineMagic(LineMagic):
+    """line magic that was converted to fn by nbconvert under python 2"""
+    start = 'get_ipython().magic('
+
+
 parsers = {}
-for cls in (NotMagic, CellMagic, LineMagic):
+for cls in (NotMagic, CellMagic, LineMagic, Py2LineMagic):
     assert cls.start not in parsers
     parsers[cls.start] = cls
-
-# TODO: need to test with py2 then add something like:
-#   line.strip().startswith('get_ipython().magic('): # py2 nbconvert has converted to fn
