@@ -46,7 +46,9 @@ setup_args = dict(
         'nbconvert',
         'pyflakes',
         'requests',
-        'beautifulsoup4'
+        'beautifulsoup4',
+        # TODO: will be removing the hv stuff
+        'holoviews'
     ],
     
     entry_points={
