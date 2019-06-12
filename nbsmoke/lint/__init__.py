@@ -74,6 +74,9 @@ class LintNb(pytest.Item):
             # should I use a temp file instead?
             filename = os.path.splitext(name)[0]+".nbsmoke-debug-%smagicprocess.py"%what
             with io.open(filename,'w',encoding='utf8') as df:
+                if sys.version_info[0]==2:
+                    # py already unicode
+                    py = py.encode('utf8')
                 df.write(py)
                 filenames.append(filename)
         else:
