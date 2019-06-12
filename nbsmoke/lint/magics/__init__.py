@@ -12,7 +12,19 @@ import warnings
 import ast
 
 import nbformat
-from nbconvert.filters.strings import ipython2python
+
+
+# try to fight the advertising/deprecation warnings and get an
+# ipython2python function without confusing messages appearing
+# all over the place
+try:
+    from IPython.core.inputtransformer2 import TransformerManager
+    ipython2python = TransformerManager().transform_cell
+except:
+    # this is the import I wanted to use, but it generates
+    # deprecation wanrings when all the latest packages are
+    # installed (as of 12 June 2019).
+    from nbconvert.filters.strings import ipython2python
 
 # these will be ignored (i.e. will not be present in python that gets
 # lint checked)
