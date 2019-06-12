@@ -227,6 +227,9 @@ class Py2LineMagic(LineMagic):
     """line magic that was converted to fn by nbconvert under python 2"""
     start = 'get_ipython().magic('
 
+    @classmethod
+    def _get_python(cls, pre_line):
+        return cls._parse(pre_line, 0)
 
 parsers = {}
 for cls in (NotMagic, CellMagic, LineMagic, Py2LineMagic):
