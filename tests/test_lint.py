@@ -2,13 +2,12 @@
 
 import os
 
-from . import nb_basic
+from . import nb_basic, assert_success
 
 def test_lint_good(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/1"})
     result = testdir.runpytest('--nbsmoke-lint','-v')
-    assert 'warnings' not in result.parseoutcomes()
-    assert result.ret == 0
+    assert_success(result)
 
 def test_lint_bad_syntax(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/1 these undefined names are a syntax error"})
@@ -37,8 +36,7 @@ def test_lint_bad(testdir):
 def test_lint_bad_silenced_with_noqa(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"undefined # noqa: deliberate :)"})
     result = testdir.runpytest('--nbsmoke-lint','-v')
-    assert result.ret == 0
-    assert 'warnings' not in result.parseoutcomes()
+    assert_success(result)
 
 def test_lint_bad_onlywarn(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/1 these undefined names are definitely undefined"})

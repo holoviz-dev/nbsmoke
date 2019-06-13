@@ -281,5 +281,5 @@ def test_lint_magics_hv_bad_opts_syntax2(testdir):
     result = testdir.runpytest('--nbsmoke-lint','-v')
     assert result.ret == 1
     result.stdout.re_match_lines_random(
-        ["^E.*SyntaxError: Failed to parse remainder of string: 'should not be here'"])
+        ["^E.*SyntaxError: Failed to parse remainder of string: u?'should not be here'"])
     assert 'warnings' not in result.parseoutcomes()

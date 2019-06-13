@@ -54,3 +54,7 @@ nb_basic = u'''
  "nbformat_minor": 2
 }
 '''
+
+def assert_success(result):
+    assert result.ret == 0
+    assert 'warnings' not in result.parseoutcomes()

@@ -8,6 +8,7 @@ info.
 
 """
 
+import sys
 import warnings
 import ast
 
@@ -123,7 +124,11 @@ def _process_magics(magic):
         # to add to SIMPLE_MAGICS, IGNORED_MAGICS,
         # other_magic_handlers via command-line arg and ini file. And
         # point to that mechanism in this warning.
-        warnings.warn("nbsmoke doesn't know how to process the '%s' magic and has ignored it. Line:\n%s\nPlease file an issue at github.com/pyviz/nbsmoke/issues if it should be processed, or if it should be silently ignored."%(magic.name,magic.line))
+        w = "nbsmoke doesn't know how to process the '%s' magic and has ignored it. Line:\n%s\nPlease file an issue at github.com/pyviz/nbsmoke/issues if it should be processed, or if it should be silently ignored."%(magic.name,magic.line)
+        if sys.version_info[0] == 2:
+            # otherwise you get "UnicodeWarning: Warning is using unicode non convertible to ascii, converting to a safe representation" from pytest
+            w = w.encode('utf8')
+        warnings.warn(w)
         content = 'pass # was: %s'%magic.line
 
     return magic.indent + content
@@ -227,9 +232,13 @@ class Py2LineMagic(LineMagic):
     """line magic that was converted to fn by nbconvert under python 2"""
     start = 'get_ipython().magic('
 
-    @classmethod
-    def _get_python(cls, pre_line):
-        return cls._parse(pre_line, 0)
+    @staticmethod
+    def _parse(x,i):
+        bits = LineMagic._parse(x, 0).split(" ", 1)
+        if i == 0:
+            return bits[i]
+        else:
+            return bits[i] if len(bits)>i else ''
 
 parsers = {}
 for cls in (NotMagic, CellMagic, LineMagic, Py2LineMagic):

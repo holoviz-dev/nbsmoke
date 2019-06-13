@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from . import assert_success
+
 nb_variety_of_magics = u'''
 {
  "cells": [
@@ -369,15 +371,13 @@ def test_lint_magics_nowarn(testdir):
     # TODO break this test up into more specific ones?
     testdir.makefile('.ipynb', testing123=nb_variety_of_magics)
     result = testdir.runpytest('--nbsmoke-lint','-v')
-    assert 'warnings' not in result.parseoutcomes()
-    assert result.ret == 0
+    assert_success(result)
 
 def test_lint_line_magics_good(testdir):
     # line magic with one arg
     testdir.makefile('.ipynb', testing123=nb_line_magic%{'prefix':''})
     result = testdir.runpytest('--nbsmoke-lint','-v')
-    assert 'warnings' not in result.parseoutcomes()
-    assert result.ret == 0
+    assert_success(result)
 
 def test_lint_line_magics_bad(testdir):
     # line magic with undefined name
@@ -389,8 +389,7 @@ def test_lint_line_magics_bad(testdir):
 def test_lint_line_magics_with_cell_magics_good(testdir):
     testdir.makefile('.ipynb', testing123=nb_cell_and_line_magics%{'dim_name':'adim'})
     result = testdir.runpytest('--nbsmoke-lint','-v')
-    assert result.ret == 0
-    assert 'warnings' not in result.parseoutcomes()
+    assert_success(result)
 
 def test_lint_line_magics_with_cell_magics_bad(testdir):
     testdir.makefile('.ipynb', testing123=nb_cell_and_line_magics%{'dim_name':'bad_name'})
@@ -410,8 +409,7 @@ def test_lint_line_magics_with_skipped_cell_magics_bad(testdir):
 def test_lint_magics_skip_warn_about_zero_arg(testdir):
     testdir.makefile('.ipynb', testing123=nb_unhandled_magics%{'magic_arg':''})
     result = testdir.runpytest('--nbsmoke-lint','-v')
-    assert result.ret == 0
-    assert 'warnings' not in result.parseoutcomes()
+    assert_success(result)
 
 def test_lint_magics_warn_about_unhandled(testdir):
     testdir.makefile('.ipynb', testing123=nb_unhandled_magics%{'magic_arg':'arg'})
@@ -443,15 +441,12 @@ def test_optional_import_warn(testdir):
 def test_lint_line_magics_indent(testdir):
     testdir.makefile('.ipynb', testing123=nb_lint_line_magic_indent)
     result = testdir.runpytest('--nbsmoke-lint','-v')
-    assert result.ret == 0
-    assert 'warnings' not in result.parseoutcomes()
+    assert_success(result)
 
 def test_lint_cell_line_magics_indent(testdir):
     testdir.makefile('.ipynb', testing123=nb_lint_cell_line_magic_indent)
     result = testdir.runpytest('--nbsmoke-lint','-v')
-    assert result.ret == 0
-    assert 'warnings' not in result.parseoutcomes()
-
+    assert_success(result)
 
 def test_magics_detection(testdir):
     # if you were to parse ipython stuff line by line, you might mistake
@@ -462,8 +457,8 @@ def test_magics_detection(testdir):
     result = testdir.runpytest('--nbsmoke-lint','-v')
     # if falsely detecting magic, the "pass" that gets inserted for
     # the unknown magic would be a syntax error
-    assert result.ret == 0
+    #
     # also, the following should not be present (would be warned about
     # as unknown magic)
     #   get_ipython().run_line_magic('metric', ')')
-    assert 'warnings' not in result.parseoutcomes()
+    assert_success(result)

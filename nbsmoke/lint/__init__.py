@@ -45,13 +45,13 @@ class LintNb(pytest.Item):
             self._write_debug_file(debug, ipy, self.name, "pre", filenames)
 
             py = magics.ipython_to_python_for_flake_checks(ipy)
-            if sys.version_info[0]==2:
-                # notebooks will start with "coding: utf-8", but py already unicode
-                py = py.encode('utf8')
 
             self._write_debug_file(debug, py, self.name, "post", filenames)
 
-            flake_result = _pyflakes.flake_check(py,self.name)
+            flake_result = _pyflakes.flake_check(
+                # notebooks will start with "coding: utf-8", but py already unicode
+                py.encode('utf8') if sys.version_info[0]==2 else py,
+                self.name)
 
             if flake_result['status'] != 0:
                 msg = "%s\n** "%self.name
@@ -74,10 +74,7 @@ class LintNb(pytest.Item):
             # should I use a temp file instead?
             filename = os.path.splitext(name)[0]+".nbsmoke-debug-%smagicprocess.py"%what
             with io.open(filename,'w',encoding='utf8') as df:
-                if sys.version_info[0]==2:
-                    # py already unicode
-                    py = py.encode('utf8')
                 df.write(py)
-                filenames.append(filename)
+            filenames.append(filename)
         else:
             filenames.append("pass --nbsmoke-lint-debug")

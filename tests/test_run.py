@@ -5,19 +5,14 @@ import io
 import sys
 import shutil
 
-from . import nb_basic
-
-# TODO: many of these functions should do "assert 'warnings' not in
-# result.parseoutcomes()" but can't because of warnings from
-# underlying stack, e.g.
-#   DeprecationWarning: KernelManager._kernel_name_changed is deprecated in traitlets 4.1: use @observe and @unobserve instead.', '    def _kernel_name_changed(self, name, old, new)
+from . import nb_basic, assert_success
 
 # maybe this test is overkill now we check for certain output in the run tests?
 def test_definitely_ran_paranoid(testdir):
     assert not os.path.exists('sigh')
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"open('x','w').write('y')"})
     result = testdir.runpytest('--nbsmoke-run','-v')
-    assert result.ret == 0
+    assert_success(result)
     with open('x','r') as f:
         assert f.read() == 'y'
     assert os.path.isfile('sigh')
@@ -25,7 +20,7 @@ def test_definitely_ran_paranoid(testdir):
 def test_run_good(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/1"})
     result = testdir.runpytest('--nbsmoke-run','-v')
-    assert result.ret == 0
+    assert_success(result)
     result.stdout.re_match_lines_random(
         [".*collected 1 item$",
          ".*testing123.ipynb.*PASSED.*"])
@@ -34,6 +29,7 @@ def test_run_bad(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/0"})
     result = testdir.runpytest('--nbsmoke-run','-v')
     assert result.ret == 1
+    assert 'warnings' not in result.parseoutcomes()
     result.stdout.re_match_lines_random([".*ZeroDivisionError.*"])
 
 def test_run_good_html(testdir):
@@ -46,7 +42,7 @@ def test_run_good_html(testdir):
         '--nbsmoke-run',
         '--store-html=%s'%testdir.tmpdir.strpath,
         '-v')
-    assert result.ret == 0
+    assert_success(result)
 
     # test that html has happened
     targets = [
@@ -74,7 +70,7 @@ def test_skip_run(testdir):
     testdir.makefile('.ipynb', skipmetoo=nb_basic%{'the_source':"1/0"})
     testdir.makefile('.ipynb', skipmenot=nb_basic%{'the_source':"1/1"})
     result = testdir.runpytest('--nbsmoke-run','-v')
-    assert result.ret == 0
+    assert_success(result)
     result.stdout.re_match_lines_random(
         [".*collected 4 items$",
          ".*alsoskipme.ipynb.*SKIPPED",
@@ -89,4 +85,4 @@ def test_cwd_like_jupyter_notebook(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"import os; assert os.path.isfile('hello.txt')"})
     shutil.move('testing123.ipynb', 'sub')
     result = testdir.runpytest('--nbsmoke-run','-v')
-    assert result.ret == 0
+    assert_success(result)
