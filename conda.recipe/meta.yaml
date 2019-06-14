@@ -10,6 +10,9 @@ source:
 build:
   noarch: python
   script: python setup.py install --single-version-externally-managed --record=record.txt
+  script_env:
+    # see note in tox.ini re. PYTHONWARNINGS
+   - PYTHONWARNINGS
 
 requirements:
   build:
@@ -36,7 +39,7 @@ test:
     - tests
     - test-notebooks
   commands:
-    - pytest -W ignore:DeprecationWarning -v tests
+    - pytest -v tests
 
 about:
   home: {{ sdata['url'] }}
