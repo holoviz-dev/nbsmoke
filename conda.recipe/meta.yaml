@@ -36,7 +36,7 @@ test:
     - tests
     - test-notebooks
   commands:
-    - pytest -v tests
+    - pytest -W ignore:DeprecationWarning -v tests
 
 about:
   home: {{ sdata['url'] }}
