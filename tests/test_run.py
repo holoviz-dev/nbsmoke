@@ -5,8 +5,6 @@ import io
 import sys
 import shutil
 
-import pytest
-
 from . import nb_basic, run_args
 
 # maybe this test is overkill now we check for certain output in the run tests?
