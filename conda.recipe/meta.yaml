@@ -10,9 +10,6 @@ source:
 build:
   noarch: python
   script: python setup.py install --single-version-externally-managed --record=record.txt
-  script_env:
-    # see note in tox.ini re. PYTHONWARNINGS
-   - PYTHONWARNINGS
 
 requirements:
   build:

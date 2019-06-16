@@ -55,6 +55,19 @@ nb_basic = u'''
 }
 '''
 
-def assert_success(result):
-    assert result.ret == 0
-    assert 'warnings' not in result.parseoutcomes()
+WARNINGS_ARE_ERRORS = '-W error'
+VERBOSE = '-v'
+# Ignore deprecation warnings until the many deprecation warnings stop
+# coming from ipython and traitlets as used by nbconvert
+IGNORE_DEPRECATION_WARNINGS = '-W ignore::DeprecationWarning'
+
+_all_args = [
+    VERBOSE,
+    WARNINGS_ARE_ERRORS,
+    IGNORE_DEPRECATION_WARNINGS
+]
+
+
+lint_args = ['--nbsmoke-lint'] + _all_args
+
+run_args = ['--nbsmoke-run'] + _all_args

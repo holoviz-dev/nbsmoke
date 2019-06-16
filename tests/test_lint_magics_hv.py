@@ -1,3 +1,5 @@
+from . import lint_args
+
 nb_hv_good = u'''
 {
  "cells": [
@@ -238,13 +240,12 @@ def test_lint_magics_hv_good(testdir):
     # TODO: right now just that it hasn't caused errors, but should
     # check there's content + noqa in there
     testdir.makefile('.ipynb', testing123=nb_hv_good)
-    result = testdir.runpytest('--nbsmoke-lint','-v')
+    result = testdir.runpytest(*lint_args)
     assert result.ret == 0
-    assert 'warnings' not in result.parseoutcomes()
 
 def test_lint_magics_hv_bad(testdir):
     testdir.makefile('.ipynb', testing123=nb_hv_bad)
-    result = testdir.runpytest('--nbsmoke-lint','-v')
+    result = testdir.runpytest(*lint_args)
     result.stdout.re_match_lines_random(
         [".*undefined name 'no'$",
          ".*undefined name 'a'$",
@@ -256,30 +257,26 @@ def test_lint_magics_hv_bad(testdir):
 
 def test_lint_magics_hv_cell_and_line_good(testdir):
     testdir.makefile('.ipynb', testing123=nb_cell_and_line%{'dim_name':'adim'})
-    result = testdir.runpytest('--nbsmoke-lint','-v')
+    result = testdir.runpytest(*lint_args)
     assert result.ret == 0
-    assert 'warnings' not in result.parseoutcomes()
 
 def test_lint_magics_hv_cell_and_line_bad(testdir):
     testdir.makefile('.ipynb', testing123=nb_cell_and_line%{'dim_name':'bad_name'})
-    result = testdir.runpytest('--nbsmoke-lint','-v')
+    result = testdir.runpytest(*lint_args)
     result.stdout.re_match_lines_random(
         [".*undefined name 'adim'$"])
     assert result.ret == 1
-    assert 'warnings' not in result.parseoutcomes()
 
 def test_lint_magics_hv_bad_opts_syntax(testdir):
     testdir.makefile('.ipynb', testing123=nb_bad_opts_syntax)
-    result = testdir.runpytest('--nbsmoke-lint','-v')
+    result = testdir.runpytest(*lint_args)
     assert result.ret == 1
     result.stdout.re_match_lines_random(
         ["^E.*SyntaxError: Invalid specification syntax.$"])
-    assert 'warnings' not in result.parseoutcomes()
 
 def test_lint_magics_hv_bad_opts_syntax2(testdir):
     testdir.makefile('.ipynb', testing123=nb_bad_opts_syntax2)
-    result = testdir.runpytest('--nbsmoke-lint','-v')
+    result = testdir.runpytest(*lint_args)
     assert result.ret == 1
     result.stdout.re_match_lines_random(
         ["^E.*SyntaxError: Failed to parse remainder of string: u?'should not be here'"])
-    assert 'warnings' not in result.parseoutcomes()
