@@ -412,7 +412,7 @@ def test_lint_magics_skip_warn_about_zero_arg(testdir):
 
 def test_lint_magics_warn_about_unhandled(testdir):
     testdir.makefile('.ipynb', testing123=nb_unhandled_magics%{'magic_arg':'arg'})
-    _args = lint_args.copy()
+    _args = list(lint_args)
     _args.remove(WARNINGS_ARE_ERRORS)
     result = testdir.runpytest(*_args)
     assert result.ret == 0
