@@ -36,7 +36,7 @@ def test_lint_bad_silenced_with_noqa(testdir):
 
 def test_lint_bad_onlywarn(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/1 these undefined names are definitely undefined"})
-    _args = lint_args.copy()
+    _args = list(lint_args)
     _args.remove(WARNINGS_ARE_ERRORS)
     _args.append("--nbsmoke-lint-onlywarn")
     result = testdir.runpytest(*_args)
