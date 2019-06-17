@@ -1,6 +1,6 @@
 environment:
   matrix:
-    - TOXENV: py27
+#    - TOXENV: py27
     - TOXENV: py36
 
 matrix:
