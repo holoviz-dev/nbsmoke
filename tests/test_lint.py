@@ -59,16 +59,10 @@ def test_lint_bad_debug(testdir):
     print(result.parseoutcomes())
 
     assert result.ret == 1
-
-#    warnings.warn("result.ret=%s"%result.ret)
-#    warnings.warn("outlines=%s"%result.outlines)
-#    warnings.warn("ret==1? %s"%(result.ret==1))
-
-# TEMP     assert result.ret == 1
-# TEMP     assert result.parseoutcomes()['failed'] == 1
-# TEMP     result.stdout.re_match_lines_random(
-# TEMP         [".*undefined name 'undefined_name'.*",
-# TEMP          ".*To see python source that was checked by pyflakes.*testing123.nbsmoke-debug-postmagicprocess.py$",
-# TEMP          ".*To see python source before magics were handled by nbsmoke.*testing123.nbsmoke-debug-premagicprocess.py$"])
-# TEMP     assert os.path.isfile("testing123.nbsmoke-debug-premagicprocess.py")
-# TEMP     assert os.path.isfile("testing123.nbsmoke-debug-postmagicprocess.py")
+    assert result.parseoutcomes()['failed'] == 1
+    result.stdout.re_match_lines_random(
+        [".*undefined name 'undefined_name'.*",
+         ".*To see python source that was checked by pyflakes.*testing123.nbsmoke-debug-postmagicprocess.py$",
+         ".*To see python source before magics were handled by nbsmoke.*testing123.nbsmoke-debug-premagicprocess.py$"])
+    assert os.path.isfile("testing123.nbsmoke-debug-premagicprocess.py")
+    assert os.path.isfile("testing123.nbsmoke-debug-postmagicprocess.py")
