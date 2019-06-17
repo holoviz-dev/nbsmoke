@@ -46,7 +46,7 @@ def test_lint_bad_onlywarn(testdir):
         [".*invalid syntax.*",
          ".*1/1 these undefined names are definitely undefined.*"])
 
-
+import warnings
 def test_lint_bad_debug(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"undefined_name"})
     result = testdir.runpytest(*(lint_args + ['--nbsmoke-lint-debug']))
@@ -55,6 +55,10 @@ def test_lint_bad_debug(testdir):
     print(result.ret)    
     print(result.outlines)
     print(result.ret == 1)
+
+    warnings.warn("result.ret=%s"%result.ret)
+    warnings.warn("outlines=%s"%result.outlines)
+    warnings.warn("ret==1? %s"%(result.ret==1))
 
 # TEMP     assert result.ret == 1
 # TEMP     assert result.parseoutcomes()['failed'] == 1
