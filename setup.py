@@ -41,7 +41,8 @@ setup_args = dict(
     install_requires=[
         'pytest >=3.1.1',
         'jupyter_client',
-        'ipykernel',
+# TODO appveyor debugging
+#        'ipykernel',
         'nbformat',
         'nbconvert',
         'pyflakes',
