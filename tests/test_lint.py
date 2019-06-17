@@ -58,6 +58,8 @@ def test_lint_bad_debug(testdir):
     print(result.ret == 1)
     print(result.parseoutcomes())
 
+    assert result.ret == 1
+
 #    warnings.warn("result.ret=%s"%result.ret)
 #    warnings.warn("outlines=%s"%result.outlines)
 #    warnings.warn("ret==1? %s"%(result.ret==1))
