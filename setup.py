@@ -43,7 +43,7 @@ setup_args = dict(
         'jupyter_client',
 # TODO appveyor debugging
 #        'ipykernel',
-        'ipython',
+        'ipython <6',
         'tornado ==4.1',
         'nbformat',
         'nbconvert',
