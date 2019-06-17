@@ -8,6 +8,6 @@ matrix:
 
 build: false
 
-install: C:\Python36\python -m pip install -U tox
+install: pip install tox
 
-test_script: C:\Python36\scripts\tox
+test_script: tox
