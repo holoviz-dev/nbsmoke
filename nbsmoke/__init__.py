@@ -146,7 +146,7 @@ def pytest_collect_file(path, parent):
     it_is_nb_file = parent.config.getini('it_is_nb_file')
     if it_is_nb_file == '':
         #"^((?!\.nbval).)*\.ipynb$"
-        it_is_nb_file = "^.*\.ipynb"
+        it_is_nb_file = r"^.*\.ipynb"
     if re.match(it_is_nb_file,path.strpath,re.IGNORECASE):
         if opt.nbsmoke_run or opt.nbsmoke_lint or opt.nbsmoke_verify:
             # TODO express via the options system if you ever figure it out

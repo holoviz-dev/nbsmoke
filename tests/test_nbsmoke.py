@@ -43,7 +43,7 @@ def test_nbsmoke_cell_timeout_ini_setting(testdir):
 
     
 def test_it_is_nbfile(testdir):
-    testdir.makeini("""
+    testdir.makeini(r"""
         [pytest]
         it_is_nb_file = ^.*\.something$
     """)
