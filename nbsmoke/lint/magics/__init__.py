@@ -27,109 +27,244 @@ except:
     # installed (as of 12 June 2019).
     from nbconvert.filters.strings import ipython2python
 
+from . import holoviews_support
+from . import builtins_support
+
+from ..__init__ import _Unavailable #nice!
+
+# TODO: still nede to investigate the following line magics (and what
+# does ipython convert do to them?):
+#
+#   ? cd
+#   ? dirs
+#    macro
+#   popd
+#   pushd
+#   pwd
+#   pylab (it imports all numpy, pylab, etc etc)
+#   rehashx
+#   reset?
+#   reset_selective
+#   sc
+#   sx
+#   system
+#   tb
+#   xdel??
+#   xmode
+
+# maybe skip?:
+#
+#  ? alias
+#  ? alias_magic
+#  ? autoawait
+#  ?
+
+# ???
+# autocall
+# automagic
+#
+
+# TODO: Allow people to ignore stuff per project.  E.g. allow
+# to add to SIMPLE_MAGICS, IGNORED_MAGICS,
+# other_magic_handlers via command-line arg and ini file. And
+# point to that mechanism in this warning.
+
 # these will be ignored (i.e. will not be present in python that gets
 # lint checked)
-IGNORED_MAGICS = ['output','timer','matplotlib','env','load','history','writefile','bash','html','capture']
-# TODO: shouldn;t output magic be handled by hv? It's hv only?
+IGNORED_LINE_MAGICS = [
+#    'timer',  ???
+    'bookmark',
+    'colors',
+    'conda',
+    'config',
+    'debug',
+    'dhist',
+    'doctest_mode',
+    'edit',
+    'env',
+    'gui',
+    'history',
+    'killbgscripts',
+    'load',
+    'load_ext',
+    'loadpy',
+    'logon',
+    'logoff',
+    'logstart',
+    'logstate',
+    'logstop',
+    'lsmagic',
+    'magic',
+    'matplotlib',
+    'notebook',
+    'page',
+    'pastebin',
+    'pdb',
+    'pdef',
+    'pdoc',
+    'pfile',
+    'pinfo',
+    'pinfo2',
+    'pip',
+    'pprint',
+    'precision',
+    'psearch',
+    'psource',
+    'pycat',
+    'quickref',
+    'recall',
+    'reload_ext',
+    'rerun',
+    'run',
+    'save',
+    'set_env',
+    'unalias',
+    'unload_ext',
+    'who',
+    'who_ls',
+    'whos',
+]
 
-# "magic xyz..." will be replaced by "xyz..."
-SIMPLE_MAGICS = ['time','timeit','prun']
+IGNORED_CELL_MAGICS = [
+    ## other languages / don't interact with python
+    'html',
+    'javascript',
+    'js',
+    'latex',
+    'markdown',
+    'svg',
+    ## misc / don't interact with python
+    'writefile',
+    'matplotlib'
+]
 
-# TODO: there are lots more inbuilt magics we should probably
-# handle. See get_ipython().magics_manager.registry.
 
-# placeholder for unavailable imports
-class _Unavailable:
-    def __init__(self,e):
-        self.e = e
+# things you don't want to see in your notebooks
+BLACKLISTED_LINE_MAGICS = []
+BLACKLISTED_CELL_MAGICS = []
+
+# "%magic xyz..." will be replaced by "xyz..."
+SIMPLE_LINE_MAGICS = ['time','timeit','prun']
 
 # fns that take some particular magic and turn it into a python line
 # that is appropriate for linting (e.g. could return a no-op that uses
 # an imported name, or just "pass", etc).
-other_magic_handlers = {}
+other_line_magic_handlers = {}
+other_cell_magic_handlers = {}
 
-try:
-    from . import holoviews_support
-    other_magic_handlers['opts'] = holoviews_support.opts_handler
-except ImportError as e:
-    other_magic_handlers['opts'] = _Unavailable(e)
+for hmm in (builtins_support, holoviews_support):
+    other_line_magic_handlers.update(hmm.line_magic_handlers)
+    other_cell_magic_handlers.update(hmm.cell_magic_handlers)
 
-
-def insert_get_ipython(nb):
-    # define and use get_ipython (for pyflakes)
-    if len(nb['cells']) > 0:
-        # the get_ipython() is so pyflakes doesn't complain if no
-        # magics present (which would leave get_ipython unused)
-        get_ipython_cell = nbformat.v4.new_code_cell(
-            'from IPython import get_ipython\nget_ipython()')
-        nb['cells'].insert(0,get_ipython_cell)
+# TODO: the handlers now have a bad interface and are side effecty
 
 
-def ipython_to_python_for_flake_checks(ipy):
-    """Given some ipython, return python code suitable for flake checking.
+# TODO: suddenly had to make some fns into a class to support blacklists; should rework.
+class Thing(object):
 
-    Regular python (non-magic) lines will be left alone.
+    def __init__(self, extra_cell_blacklist=None, extra_line_blacklist=None):
+        self.blacklisted_cell = (extra_cell_blacklist or []) + BLACKLISTED_CELL_MAGICS
+        self.blacklisted_line = (extra_line_blacklist or []) + BLACKLISTED_LINE_MAGICS
 
-    Zero-arg magics will be ignored (omitted from generated python).
+    @staticmethod
+    def insert_get_ipython(nb):
+        # define and use get_ipython (for pyflakes)
+        if len(nb['cells']) > 0:
+            # the get_ipython() is so pyflakes doesn't complain if no
+            # magics present (which would leave get_ipython unused)
+            get_ipython_cell = nbformat.v4.new_code_cell(
+                'from IPython import get_ipython\nget_ipython()')
+            nb['cells'].insert(0,get_ipython_cell)
 
-    Certain other magics will also be ignored (omitted from generated
-    python), e.g. "matplotlib" (see IGNORED_MAGICS).
 
-    Certain single-argument magics that wrap some regular python will
-    be unwrapped: (e.g. "%time fn()" will be replaced by "fn()"; see
-    SIMPLE_MAGICS).
+    def ipython_to_python_for_flake_checks(self, ipy):
+        """Given some ipython, return python code suitable for flake checking.
 
-    Optional "magic handlers" can be registered to deal with
-    custom/third-party magics (see other_magic_handlers).
+        Regular python (non-magic) lines will be left alone.
 
-    If a magic is encountered that wasn't handled in any of the above
-    ways, it'll be omitted, but with a warning.
-    """
-    ipy_lines = ipy.split('\n') # this is valid for notebooks (json) - i.e. can't be other line endings?
-    py_lines = []
-    _transform_ipy_to_py(ipy_lines, py_lines)
-    return "\n".join(py_lines)
+        Zero-arg magics will be ignored (omitted from generated python).
 
-def _transform_ipy_to_py(lines_in, lines_out):
-    for line in lines_in:
-        magic_parser = _get_parser(line)
-        lines_out.append(_process_magics(magic_parser))
-        _transform_ipy_to_py(magic_parser.additional_lines, lines_out)
+        Certain other magics will also be ignored (omitted from
+        generated python), e.g. "matplotlib" (see IGNORED_LINE_MAGICS,
+        IGNORED_CELL_MAGICS).
 
-def _get_parser(line):
-    parser = None
+        Certain single-argument magics that wrap some regular python will
+        be unwrapped: (e.g. "%time fn()" will be replaced by "fn()"; see
+        SIMPLE_LINE_MAGICS).
+
+        Optional "magic handlers" can be registered to deal with
+        custom/third-party magics (see other_line_magic_handlers,
+        other_cell_magic_handlers).
+
+        If a magic is encountered that wasn't handled in any of the above
+        ways, it'll be omitted, but with a warning.
+
+        Finally, after the above, if a magic appears in the
+        user-supplied cell or line magics blacklist, or is in
+        BLACKLISTED_CELL_MAGICS or BLACKLISTED_LINE_MAGICS, it will be
+        flagged as a flake.
+        """
+        ipy_lines = ipy.split('\n') # this is valid for notebooks (json) - i.e. can't be other line endings?
+        py_lines = []
+        self._transform_ipy_to_py(ipy_lines, py_lines)
+        return "\n".join(py_lines)
+
+    def _transform_ipy_to_py(self, lines_in, lines_out):
+        for line in lines_in:
+            magic_parser = _get_parser(line)
+            lines_out.append(self._process(magic_parser))
+            self._transform_ipy_to_py(magic_parser.additional_lines, lines_out)
+
+    def _process(self, magic):
+        if isinstance(magic, NotMagic):
+            content = magic.line
+        elif isinstance(magic, LineMagic):
+            content = _process_magics(magic, other_line_magic_handlers, IGNORED_LINE_MAGICS, self.blacklisted_line, SIMPLE_LINE_MAGICS)
+        elif isinstance(magic, CellMagic):
+            content = _process_magics(magic, other_cell_magic_handlers, IGNORED_CELL_MAGICS, self.blacklisted_cell)
+        else:
+            raise
+        return content
+
+
+def _get_parser(line): # yuck
     for start,cls in parsers.items():
-        if line.lstrip().startswith(start):
-            parser = cls
-    return parser(line)
+        if start is not None and line.lstrip().startswith(start):
+            return cls(line)
+    return parsers[None](line) # default/no magic
 
-def _process_magics(magic):
-    if isinstance(magic, NotMagic):
-        content = magic.python
+def _call_a_handler(handlers, magic):
+    handler = handlers[magic.name]
+    if isinstance(handler, _Unavailable):
+        # this is a bit rubbish. and how to reconstruct original error?
+        raise Exception("nbsmoke can't process the following '%s' magic without additional dependencies:\n  %s\n. Error was:\n  %s"%(magic.name, magic.line, handler.e.msg))
+    return handler(magic)
+
+def _process_magics(magic, other_magic_handlers, ignored_magics, blacklisted_magics, simple_magics=None):
+    if simple_magics is None:
+        simple_magics = []
+
+    if magic.name in other_magic_handlers:
+        content = _call_a_handler(other_magic_handlers, magic)
     elif magic.skippable:
-        # this is really just to help with debugging
-        content = 'pass # was line: %s'%magic.line
-    elif magic.name in IGNORED_MAGICS:
-        content = 'pass # was %s: %s %s'%(magic.__class__.__name__,magic.name,magic.python)
-    elif magic.name in SIMPLE_MAGICS:
+        # pass with original line as comment is just to help with debugging
+        content = 'pass # skipped original line: %s'%magic.line
+    elif magic.name in ignored_magics:
+        content = 'pass # deliberately ignored %s: %s %s'%(magic.__class__.__name__,magic.name,magic.python)
+    elif magic.name in simple_magics:
         content = magic.python
-    elif magic.name in other_magic_handlers:
-        handler = other_magic_handlers[magic.name]
-        if isinstance(handler, _Unavailable):
-            # this is a bit rubbish. and how to reconstruct original error?
-            raise Exception("nbsmoke can't process the following '%s' magic without additional dependencies:\n  %s\n. Error was:\n  %s"%(magic.name, magic.line, handler.e.msg))
-        content = handler(magic.python)
     else:
-        # TODO: Allow people to ignore stuff per project.  E.g. allow
-        # to add to SIMPLE_MAGICS, IGNORED_MAGICS,
-        # other_magic_handlers via command-line arg and ini file. And
-        # point to that mechanism in this warning.
-        w = "nbsmoke doesn't know how to process the '%s' magic and has ignored it. Line:\n%s\nPlease file an issue at github.com/pyviz/nbsmoke/issues if it should be processed, or if it should be silently ignored."%(magic.name,magic.line)
+        # TODO: When users can configure simple/ignored etc magics,
+        # this warning could point to that mechanism.
+        w = "nbsmoke doesn't know how to process the '%s' %s and has ignored it. Line:\n%s\nPlease file an issue at github.com/pyviz/nbsmoke/issues if it should be processed as part of flake checks, or if it should be silently ignored during flake checks."%(magic.name,magic.__class__.__name__,magic.line)
         if sys.version_info[0] == 2:
             # otherwise you get "UnicodeWarning: Warning is using unicode non convertible to ascii, converting to a safe representation" from pytest
             w = w.encode('utf8')
         warnings.warn(w)
         content = 'pass # was: %s'%magic.line
+
+    if magic.name in blacklisted_magics:
+        content += ' # nbsmoke-blacklisted: %s'%magic.name
 
     return magic.indent + content
 
@@ -138,7 +273,7 @@ def _process_magics(magic):
 # were more of them, but I just cut a few out).
 
 # abstract
-class _HackyParser(object):
+class _Parser(object):
     """For parsing 'a line of python' that was produced by nbconvert ipynb
     -> python.
 
@@ -150,7 +285,7 @@ class _HackyParser(object):
     - see "start".
 
     """
-    start = ''
+    start = None
     def __init__(self,line):
         """Attributes:
 
@@ -197,12 +332,12 @@ class _HackyParser(object):
     def _get_additional_lines(self, pre_line):
         return []
 
-class NotMagic(_HackyParser):
+class NotMagic(_Parser):
     """Line wasn't a magic"""
     pass
 
 # abstract
-class _Magic(_HackyParser):
+class _Magic(_Parser):
 
     @staticmethod
     def _parse(x,i):
@@ -234,6 +369,12 @@ class Py2LineMagic(LineMagic):
 
     @staticmethod
     def _parse(x,i):
+# TODO: haven't done py2 yet
+#from IPython.core.inputtransformer2 import (
+#    ESC_MAGIC,
+        #magic_name, _, magic_arg_s = arg_s.partition(' ')
+        #magic_name = magic_name.lstrip(prefilter.ESC_MAGIC)
+        #return self.run_line_magic(magic_name, magic_arg_s, _stack_depth=2)        
         bits = LineMagic._parse(x, 0).split(" ", 1)
         if i == 0:
             return bits[i]

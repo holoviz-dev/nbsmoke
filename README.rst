@@ -35,7 +35,7 @@ You can install nbsmoke via `pip`_ from `PyPI`_::
 Or you can install nbsmoke via `conda`_ from `anaconda.org`_::
 
     $ conda install -c pyviz/label/dev -c conda-forge nbsmoke
-    
+
 
 Usage
 -----
@@ -60,7 +60,7 @@ Instead of all files in a directory, you can specify a list e.g.::
 If you want to restrict pytest to running only your notebook tests, use `-k`, e.g.::
 
     $ pytest --nbsmoke-run -k ".ipynb"
-    
+
 Additional options are available by standard pytest 'ini'
 configuration in setup.cfg, pytest.ini, or tox.ini::
 
@@ -75,6 +75,17 @@ configuration in setup.cfg, pytest.ini, or tox.ini::
     # case insensitive re to match for file to be considered notebook;
     # defaults to ``^.*\.ipynb``
     it_is_nb_file = ^.*\.something$
+
+    # TODO regex flakes you don't want to hear about
+    nbsmoke_flakes_to_ignore = .*hvplot.* imported but unused.*
+
+    # TODO line magics to treat as being flakes
+    nbsmoke_flakes_line_magics_blacklist = matplotlib
+
+    # TODO cells magics to treat as being flakes
+    nbsmoke_flakes_cell_magics_blacklist = bash
+                                           ruby
+
 
 nbsmoke supports ``# noqa`` comments to mark that something
 should be ignored during lint checking.
@@ -104,18 +115,16 @@ Unused imports/names themselves might seem trivial, but they can
 hinder understanding of a notebook by readers, or add dependencies
 that are not required.
 
-Using ``# noqa: explanation`` in a notebook might seem like overkill,
-but the intention is to at least force 'mysterious imports' to be
-clarified (if they are necessary at all, which ideally they shouldn't
-be). E.g. if you're importing something for its side effects, it's
-very helpful to inform the reader of that, and the ugly/strange ``#
-noqa`` should help remind you to fix the underlying problem...
+Hopefully you don't have mysterious (unused) imports in your notebook,
+but if you do, you can add ``# noqa: explanation`` to stop flake
+errors.  E.g. if you're importing something for its side effects, it's
+very helpful to inform the reader of that.
 
 Pyflakes is used as the underlying linter because "Pyflakes makes a
 simple promise: it will never complain about style, and it will try
 very, very hard to never emit false positives."
 
-    
+
 Contributing
 ------------
 

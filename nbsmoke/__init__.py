@@ -55,7 +55,6 @@ def pytest_addoption(parser):
         action="store_true",
         help="Verify notebooks")
 
-
     group.addoption(
         '--store-html',
         action="store",
@@ -76,6 +75,12 @@ def pytest_addoption(parser):
 
     # TODO: remove/rename/see pytest python_files
     parser.addini('it_is_nb_file', 're to determine whether file is notebook')
+
+    parser.addini('nbsmoke_flakes_to_ignore', "flake messages to ignore during nbsmoke's flake checking")
+
+    parser.addini('nbsmoke_flakes_cell_magics_blacklist', "cell magics you don't want to see - i.e. treat as lint.")
+    parser.addini('nbsmoke_flakes_line_magics_blacklist', "line magics you don't want to see - i.e. treat as lint")
+
 
 @contextlib.contextmanager
 def cwd(d):
@@ -123,9 +128,8 @@ class RunNb(pytest.Item):
 
     def _skip(self):
         _skip_patterns = self.parent.parent.config.getini('nbsmoke_skip_run')
-        if _skip_patterns != '' and not self.parent.parent.config.option.ignore_nbsmoke_skip_run:
-            skip_patterns = _skip_patterns.splitlines()
-            for pattern in skip_patterns:
+        if not self.parent.parent.config.option.ignore_nbsmoke_skip_run:
+            for pattern in _skip_patterns.splitlines():
                 if re.match(pattern,self.nodeid.split("::")[0],re.IGNORECASE):
                     pytest.skip()
 

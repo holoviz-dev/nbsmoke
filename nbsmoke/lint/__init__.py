@@ -13,6 +13,7 @@ import sys
 import warnings
 import io
 import os
+import re
 
 import pytest
 import nbformat
@@ -20,6 +21,9 @@ import nbconvert
 
 from . import _pyflakes
 from . import magics
+
+# list of regexes
+flakes_to_ignore = []
 
 class NBLintError(Exception):
     pass
@@ -36,7 +40,11 @@ class LintNb(pytest.Item):
         with io.open(self.name,encoding='utf8') as nbfile:
             nb = nbformat.read(nbfile, as_version=4)
 
-            magics.insert_get_ipython(nb)
+            magics_thing = magics.Thing(
+                extra_line_blacklist = _get_list_from_conf('nbsmoke_flakes_line_magics_blacklist', self.parent.parent.config),
+                extra_cell_blacklist = _get_list_from_conf('nbsmoke_flakes_cell_magics_blacklist', self.parent.parent.config))
+            magics_thing.insert_get_ipython(nb)
+
             ipy, _ = nbconvert.PythonExporter().from_notebook_node(nb)
 
             debug=self.config.option.nbsmoke_lint_debug
@@ -44,7 +52,7 @@ class LintNb(pytest.Item):
 
             self._write_debug_file(debug, ipy, self.name, "pre", filenames)
 
-            py = magics.ipython_to_python_for_flake_checks(ipy)
+            py = magics_thing.ipython_to_python_for_flake_checks(ipy)
 
             self._write_debug_file(debug, py, self.name, "post", filenames)
 
@@ -53,7 +61,15 @@ class LintNb(pytest.Item):
                 py.encode('utf8') if sys.version_info[0]==2 else py,
                 self.name)
 
-            if flake_result['status'] != 0:
+            ### remove flakes by regex
+            _user_flakes_to_ignore = self.parent.parent.config.getini('nbsmoke_flakes_to_ignore')
+            if _user_flakes_to_ignore != '':
+                _user_flakes_to_ignore = _user_flakes_to_ignore.splitlines()
+            for pattern in set(flakes_to_ignore) | set(_user_flakes_to_ignore):
+                flake_result['messages'] = [msg for msg in flake_result['messages'] if not re.search(pattern, msg)]
+            ###
+
+            if flake_result['messages']:
                 msg = "%s\n** "%self.name
                 if self.config.option.nbsmoke_lint_onlywarn and 'message_for_onlywarn' in flake_result:
                     msg += flake_result['message_for_onlywarn']
@@ -78,3 +94,14 @@ class LintNb(pytest.Item):
             filenames.append(filename)
         else:
             filenames.append("pass --nbsmoke-lint-debug")
+
+# where to put this? (although would be better to replace with something else...)
+# placeholder for unavailable imports
+class _Unavailable:
+    def __init__(self,e):
+        self.e = e
+
+def _get_list_from_conf(name,conf):
+    # does this not exist in pytest/elsewhere?
+    option_raw = conf.getini(name)
+    return option_raw.splitlines()

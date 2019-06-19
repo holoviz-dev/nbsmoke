@@ -4,6 +4,12 @@ import os
 
 from . import nb_basic, WARNINGS_ARE_ERRORS, lint_args
 
+
+def test_lint_good(testdir):
+    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/1"})
+    result = testdir.runpytest(*lint_args)
+    assert result.ret == 0
+
 def test_lint_bad_syntax(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/1 these undefined names are a syntax error"})
     result = testdir.runpytest(*lint_args)
@@ -45,13 +51,6 @@ def test_lint_bad_debug(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"undefined_name"})
     result = testdir.runpytest(*(lint_args + ['--nbsmoke-lint-debug']))
 
-    # TODO: this is temporary - debugging appveyor...
-    print(result.ret)
-    print(result.outlines)
-    print(result.errlines)
-    print(result.ret == 1)
-    print(result.parseoutcomes())
-
     assert result.ret == 1
     assert result.parseoutcomes()['failed'] == 1
     result.stdout.re_match_lines_random(
@@ -61,15 +60,11 @@ def test_lint_bad_debug(testdir):
     assert os.path.isfile("testing123.nbsmoke-debug-premagicprocess.py")
     assert os.path.isfile("testing123.nbsmoke-debug-postmagicprocess.py")
 
-def test_lint_good(testdir):
-    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/1"})
+def test_flakes_to_ignore(testdir):
+    testdir.makeini(r"""
+        [pytest]
+        nbsmoke_flakes_to_ignore = .*hvplot.* imported but unused.*
+    """)
+    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"import hvplot.pandas; import hvplot.matplotlib"})
     result = testdir.runpytest(*lint_args)
-
-    # TODO: this is temporary - debugging appveyor...
-    print(result.ret)
-    print(result.outlines)
-    print(result.errlines)
-    print(result.ret == 0)
-    print(result.parseoutcomes())
-    
     assert result.ret == 0

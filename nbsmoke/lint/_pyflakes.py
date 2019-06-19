@@ -19,6 +19,11 @@ except ImportError:
     from io import StringIO
 ###########################################################################
 
+### nbsmoke addition ######################################################
+import collections
+FakeMessage = collections.namedtuple("FakeMessage", "lineno col message message_args")
+###########################################################################
+
 
 def flake_check(codeString, filename, reporter=None):
     if reporter is None:
@@ -60,16 +65,14 @@ def flake_check(codeString, filename, reporter=None):
         r = pyflakes.reporter.Reporter(syntax_error_details, syntax_error_details)
         r.syntaxError(filename, msg, lineno, offset, text)
 # return more info
-        return {'status': 1,
-                'message_for_onlywarn': syntax_error_details.getvalue(),
+        return {'message_for_onlywarn': syntax_error_details.getvalue(),
                 'messages':["Error - see captured stderr, below."]}
 ###########################################################################
     except Exception:
         reporter.unexpectedError(filename, 'problem decoding source')
 ### nbsmoke addition ######################################################
 # return more info
-        return {'status': 1,
-                'message_for_onlywarn': 'problem decoding source',                
+        return {'message_for_onlywarn': 'problem decoding source',                
                 'messages':["Error - see captured stderr, below."]}
 ###########################################################################
     # Okay, it's syntactically valid.  Now check it.
@@ -79,13 +82,25 @@ def flake_check(codeString, filename, reporter=None):
 # hack to support '# noqa' in ipynb
     NOQA = re.compile('# noqa', re.IGNORECASE)
     noqa_lines = [i+1 for i,l in enumerate(codeString.splitlines()) if NOQA.search(l)]
+    # (I assume there was a reason for updating list in place?)
     w.messages[:] = [m for m in w.messages if m.lineno not in noqa_lines]
+###########################################################################
+
+### nbsmoke addition ######################################################
+# hack to support ' # nbsmoke-blacklisted: <magic>'
+    blacklist = re.compile('.* # nbsmoke-blacklisted: (.*)', re.IGNORECASE)
+    blacklist_messages = []
+    for i,l in enumerate(codeString.splitlines()):
+        m = blacklist.match(l)
+        if m:
+            blacklist_messages.append(
+                FakeMessage(lineno=i+1, col=m.start(1), message="nbsmoke blacklisted magic: %s", message_args=(m.group(1),)))
+    w.messages[:] = w.messages + blacklist_messages
 ###########################################################################
 
     w.messages.sort(key=lambda m: m.lineno)
 
 ### nbsmoke addition ######################################################
 # return more info
-    return {'status':len(w.messages),
-            'messages':[("line %s col %s: "%(msg.lineno,msg.col))+msg.message%msg.message_args for msg in w.messages]}
+    return {'messages':[("line %s col %s: "%(msg.lineno,msg.col))+msg.message%msg.message_args for msg in w.messages]}
 ###########################################################################

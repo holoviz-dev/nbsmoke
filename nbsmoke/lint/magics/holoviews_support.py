@@ -6,14 +6,28 @@ attempt was ever made (or will ever be made...) to do it properly :)
 
 from itertools import groupby
 
-from holoviews.util.parser import OptsSpec
+from ..__init__ import _Unavailable # nice
 
-def opts_handler(string_of_magic_args):
+try:
+    from holoviews.util.parser import OptsSpec
+except ImportError as e:
+    OptsSpec = _Unavailable(e)
+
+
+def opts_handler(magic):
     """Given the arguments to an opts magic, return line of python
 suitable for pyflakes.
 
     """
-    return " ; ".join(OptsSpec.parse(string_of_magic_args)) + " # noqa: here to use names"
+    string_of_magic_args = magic.python
+    return " ; ".join(OptsSpec.parse(string_of_magic_args)) + " # noqa: here to use names for original %s magic: %s"%(magic.__class__.__name__, magic.python)
+
+
+if isinstance(OptsSpec, _Unavailable):
+    opts_handler = OptsSpec # noqa: opts_handler unusable
+
+cell_magic_handlers = {'opts': opts_handler}
+line_magic_handlers = {'opts': opts_handler}
 
 
 def _hvparse(cls, line, ns={}):
@@ -87,5 +101,6 @@ def _hvtodict(cls, parseresult, mode='parens', ns={}):
 
     return things
 
-OptsSpec.parse = classmethod(_hvparse)
-OptsSpec.todict = classmethod(_hvtodict)
+if OptsSpec is not None:
+    OptsSpec.parse = classmethod(_hvparse)
+    OptsSpec.todict = classmethod(_hvtodict)

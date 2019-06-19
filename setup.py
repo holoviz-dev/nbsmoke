@@ -40,16 +40,24 @@ setup_args = dict(
     
     install_requires=[
         'pytest >=3.1.1',
+        ########## lint stuff
+        'pyflakes',
+        ########## notebook stuff (reading, executing)
+        # * Required imports: nbconvert, nbformat.
+        # * Need to be able to execute ipython notebooks.
+        # * Optional: process ipython magics (required import: IPython)
         'jupyter_client',
-# TODO appveyor debugging
-#        'ipykernel',
-        'ipython <6',
-        'tornado ==4.1',
+        # TODO: did I do this conditional stuff right? do I need it?
+        'ipykernel; python_version>=3.4',
+        'ipykernel <5; python_version<3.4',
+        # TODO: bug in tornado? still there?
+        'tornado ==4.1; python_version<3',
         'nbformat',
         'nbconvert',
-        'pyflakes',
+        ########## "verify" stuff
         'requests',
         'beautifulsoup4',
+        ########## "extra magics" support
         # TODO: will be removing the hv stuff
         'holoviews'
     ],

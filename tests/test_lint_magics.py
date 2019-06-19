@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from . import lint_args, WARNINGS_ARE_ERRORS
+from . import lint_args, WARNINGS_ARE_ERRORS, nb_basic
 
 nb_variety_of_magics = u'''
 {
@@ -175,7 +175,7 @@ nb_cell_skipped_and_line_magics = u'''
 '''
 
 
-
+# this is simple line magics, right?
 # note: % escaped
 nb_line_magic = u'''
 {
@@ -365,6 +365,7 @@ nb_lint_is_it_magic =  u'''
 '''
 
 
+# this is ignored line magics, right?
 def test_lint_magics_nowarn(testdir):
     # there should be no warnings for a variety of magics
     # TODO break this test up into more specific ones?
@@ -418,10 +419,10 @@ def test_lint_magics_warn_about_unhandled(testdir):
     assert result.ret == 0
     assert result.parseoutcomes()['warnings'] == 4
     result.stdout.re_match_lines_random(
-        [".*nbsmoke doesn't know how to process the.*cellmagicnonexistent.*magic and has ignored it.*",
-         ".*nbsmoke doesn't know how to process the.*linemagicnonexistent.*magic and has ignored it.*",
-         ".*nbsmoke doesn't know how to process the.*cellmagicnonexistenttwo.*magic and has ignored it.*",
-         ".*nbsmoke doesn't know how to process the.*cellmagicnonexistentthree.*magic and has ignored it.*"])
+        [".*nbsmoke doesn't know how to process the.*cellmagicnonexistent.*CellMagic and has ignored it.*",
+         ".*nbsmoke doesn't know how to process the.*linemagicnonexistent.*LineMagic and has ignored it.*",
+         ".*nbsmoke doesn't know how to process the.*cellmagicnonexistenttwo.*CellMagic and has ignored it.*",
+         ".*nbsmoke doesn't know how to process the.*cellmagicnonexistentthree.*CellMagic and has ignored it.*"])
 
 def test_optional_import_warn(testdir):
     testdir.makefile('.ipynb', testing123=nb_optional_dep)
@@ -429,7 +430,7 @@ def test_optional_import_warn(testdir):
     # what a hack
     import nbsmoke.lint.magics as M
     from collections import namedtuple
-    M.other_magic_handlers['clever_magic'] = M._Unavailable(namedtuple("SomeError", "msg")("A terrible error."))
+    M.other_line_magic_handlers['clever_magic'] = M._Unavailable(namedtuple("SomeError", "msg")("A terrible error."))
     ###
     result = testdir.runpytest(*lint_args)
     assert result.ret == 1
@@ -463,3 +464,63 @@ def test_magics_detection(testdir):
     #   get_ipython().run_line_magic('metric', ')')
     assert result.ret == 0
 
+
+def test_lint_magics_blacklisted_cell(testdir):
+    testdir.makeini(r"""
+        [pytest]
+        nbsmoke_flakes_cell_magics_blacklist = ruby
+                                               bash
+    """)
+    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"%%bash"})
+    result = testdir.runpytest(*lint_args)
+    result.stdout.re_match_lines_random([".*nbsmoke blacklisted magic: bash"])
+    assert result.ret == 1
+
+
+nb_hmm = u'''
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%%bash\\n",
+    "echo 1"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
+'''
+
+
+# TODO: do for line also?
+def test_lint_magics_blacklisted_cell_but_still_handle_cell(testdir):
+    testdir.makeini(r"""
+        [pytest]
+        nbsmoke_flakes_cell_magics_blacklist = bash
+    """)
+    testdir.makefile('.ipynb', testing123=nb_hmm)
+    result = testdir.runpytest(*lint_args)
+    result.stdout.re_match_lines_random([".*nbsmoke blacklisted magic: bash"])
+    # no error about the bash content, just that bash magics is present
+    assert result.ret == 1
+
+def test_lint_magics_blacklisted_line(testdir):
+    testdir.makeini(r"""
+        [pytest]
+        nbsmoke_flakes_line_magics_blacklist = pylab
+    """)
+    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"%pylab"})
+    result = testdir.runpytest(*lint_args)
+    result.stdout.re_match_lines_random([".*nbsmoke blacklisted magic: pylab"])    
+    assert result.ret == 1
