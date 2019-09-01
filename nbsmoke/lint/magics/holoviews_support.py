@@ -16,12 +16,11 @@ try:
 except ImportError as e:
     OptsSpec = _Unavailable(e)
 
+IGNORED_LINE_MAGICS = ['output']
+IGNORED_CELL_MAGICS = ['output']
 
 def opts_handler(magic):
-    """Given the arguments to an opts magic, return line of python
-suitable for pyflakes.
-
-    """
+    """Given an opts magic, return line of python suitable for pyflakes."""
     string_of_magic_args = magic.python
     return " ; ".join(OptsSpec.parse(string_of_magic_args)) + " # noqa: here to use names for original %s magic: %s"%(magic.__class__.__name__, magic.python)
 

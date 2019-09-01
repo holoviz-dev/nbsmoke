@@ -72,73 +72,8 @@ _Unavailable = holoviews_support._Unavailable
 
 # these will be ignored (i.e. will not be present in python that gets
 # lint checked)
-IGNORED_LINE_MAGICS = [
-#    'timer',  ???
-    'bookmark',
-    'colors',
-    'conda',
-    'config',
-    'debug',
-    'dhist',
-    'doctest_mode',
-    'edit',
-    'env',
-    'gui',
-    'history',
-    'killbgscripts',
-    'load',
-    'load_ext',
-    'loadpy',
-    'logon',
-    'logoff',
-    'logstart',
-    'logstate',
-    'logstop',
-    'lsmagic',
-    'magic',
-    'matplotlib',
-    'notebook',
-    'page',
-    'pastebin',
-    'pdb',
-    'pdef',
-    'pdoc',
-    'pfile',
-    'pinfo',
-    'pinfo2',
-    'pip',
-    'pprint',
-    'precision',
-    'psearch',
-    'psource',
-    'pycat',
-    'quickref',
-    'recall',
-    'reload_ext',
-    'rerun',
-    'run',
-    'save',
-    'set_env',
-    'unalias',
-    'unload_ext',
-    'who',
-    'who_ls',
-    'whos',
-]
-
-IGNORED_CELL_MAGICS = [
-    ## other languages / don't interact with python
-    'html',
-    'javascript',
-    'js',
-    'latex',
-    'markdown',
-    'svg',
-    ## misc / don't interact with python
-    'writefile',
-    'matplotlib'
-]
-
+IGNORED_LINE_MAGICS = []
+IGNORED_CELL_MAGICS = []
 
 # things you don't want to see in your notebooks
 BLACKLISTED_LINE_MAGICS = []
@@ -150,15 +85,15 @@ SIMPLE_LINE_MAGICS = ['time','timeit','prun']
 # fns that take some particular magic and turn it into a python line
 # that is appropriate for linting (e.g. could return a no-op that uses
 # an imported name, or just "pass", etc).
+# TODO: the handlers now have a bad interface and are side effecty
 other_line_magic_handlers = {}
 other_cell_magic_handlers = {}
 
 for hmm in (builtins_support, holoviews_support):
     other_line_magic_handlers.update(hmm.line_magic_handlers)
     other_cell_magic_handlers.update(hmm.cell_magic_handlers)
-
-# TODO: the handlers now have a bad interface and are side effecty
-
+    IGNORED_LINE_MAGICS.extend(hmm.IGNORED_LINE_MAGICS)
+    IGNORED_CELL_MAGICS.extend(hmm.IGNORED_CELL_MAGICS)
 
 # TODO: suddenly had to make some fns into a class to support blacklists; should rework.
 class Thing(object):

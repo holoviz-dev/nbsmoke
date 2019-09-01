@@ -1,6 +1,74 @@
 from IPython.utils._process_common import arg_split
 import argparse
 
+IGNORED_LINE_MAGICS = [
+#    'timer',  ???
+    'bookmark',
+    'colors',
+    'conda',
+    'config',
+    'debug',
+    'dhist',
+    'doctest_mode',
+    'edit',
+    'env',
+    'gui',
+    'history',
+    'killbgscripts',
+    'load',
+    'load_ext',
+    'loadpy',
+    'logon',
+    'logoff',
+    'logstart',
+    'logstate',
+    'logstop',
+    'lsmagic',
+    'magic',
+    'matplotlib',
+    'notebook',
+    'page',
+    'pastebin',
+    'pdb',
+    'pdef',
+    'pdoc',
+    'pfile',
+    'pinfo',
+    'pinfo2',
+    'pip',
+    'pprint',
+    'precision',
+    'psearch',
+    'psource',
+    'pycat',
+    'quickref',
+    'recall',
+    'reload_ext',
+    'rerun',
+    'run',
+    'save',
+    'set_env',
+    'unalias',
+    'unload_ext',
+    'who',
+    'who_ls',
+    'whos',
+]
+
+IGNORED_CELL_MAGICS = [
+    ## other languages / don't interact with python
+    'html',
+    'javascript',
+    'js',
+    'latex',
+    'markdown',
+    'svg',
+    ## misc / don't interact with python
+    'writefile',
+    'matplotlib'
+]
+
+
 cell_magic_handlers = {}
 line_magic_handlers = {}
 
