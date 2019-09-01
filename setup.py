@@ -59,9 +59,7 @@ setup_args = dict(
     # right? (but if so, how do I specify it's the runtime python version
     # I'm talking aobut, not the buildtime python version?)
     # Also - not sure exactly what is required now
-    ] + (['ipykernel'] if (sys.version_info[0]>=3 and sys.version_info[1]>4) else ['ipykernel <5']) + \
-        (['tornado ==4.1'] if sys.version_info[0]<3 else []), # bug in tornado - still there?
-    
+    ] + (['ipykernel'] if (sys.version_info[0]>=3 and sys.version_info[1]>4) else ['ipykernel <5']),
     entry_points={
         'pytest11': [
             'nbsmoke = nbsmoke',
