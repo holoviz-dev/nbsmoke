@@ -1,6 +1,6 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 import os
 import codecs
 from setuptools import setup, find_packages
@@ -47,9 +47,6 @@ setup_args = dict(
         # * Need to be able to execute ipython notebooks.
         # * Optional: process ipython magics (required import: IPython)
         'jupyter_client',
-        'ipykernel',
-        # 'ipykernel <5 ; python_version<3.4', TODO: don't know current status
-        # 'tornado ==4.1; python_version<3', TODO: bug in tornado? still there?
         'nbformat',
         'nbconvert',
         ########## "verify" stuff
@@ -58,7 +55,12 @@ setup_args = dict(
         ########## "extra magics" support
         # TODO: will be removing the hv stuff
         'holoviews'
-    ],
+    # TODO: I think the decision was to go with python/setup.py for this stuff,
+    # right? (but if so, how do I specify it's the runtime python version
+    # I'm talking aobut, not the buildtime python version?)
+    # Also - not sure exactly what is required now
+    ] + ['ipykernel'] if (sys.version_info[0]>=3 and sys.version_info[1]>4) else ['ipykernel <5'] + \
+        ['tornado ==4.1'] if sys.version_info[0]<3 else [], # bug in tornado - still there?
     
     entry_points={
         'pytest11': [
