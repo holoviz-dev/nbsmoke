@@ -30,7 +30,8 @@ except:
 from . import holoviews_support
 from . import builtins_support
 
-from ..__init__ import _Unavailable #nice!
+# as noted in that file, shouldn't be there but should just be replaced iwth something better anyway
+_Unavailable = holoviews_support._Unavailable
 
 # TODO: still nede to investigate the following line magics (and what
 # does ipython convert do to them?):

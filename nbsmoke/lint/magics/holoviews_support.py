@@ -6,7 +6,10 @@ attempt was ever made (or will ever be made...) to do it properly :)
 
 from itertools import groupby
 
-from ..__init__ import _Unavailable # nice
+# placeholder for unavailable imports - should do something better (also, not specific to hv)
+class _Unavailable:
+    def __init__(self,e):
+        self.e = e
 
 try:
     from holoviews.util.parser import OptsSpec

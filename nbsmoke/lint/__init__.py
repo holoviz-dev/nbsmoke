@@ -95,12 +95,6 @@ class LintNb(pytest.Item):
         else:
             filenames.append("pass --nbsmoke-lint-debug")
 
-# where to put this? (although would be better to replace with something else...)
-# placeholder for unavailable imports
-class _Unavailable:
-    def __init__(self,e):
-        self.e = e
-
 def _get_list_from_conf(name,conf):
     # does this not exist in pytest/elsewhere?
     option_raw = conf.getini(name)
