@@ -47,11 +47,9 @@ setup_args = dict(
         # * Need to be able to execute ipython notebooks.
         # * Optional: process ipython magics (required import: IPython)
         'jupyter_client',
-        # TODO: did I do this conditional stuff right? do I need it?
-        'ipykernel; python_version>=3.4',
-        'ipykernel <5; python_version<3.4',
-        # TODO: bug in tornado? still there?
-        'tornado ==4.1; python_version<3',
+        'ipykernel',
+        # 'ipykernel <5 ; python_version<3.4', TODO: don't know current status
+        # 'tornado ==4.1; python_version<3', TODO: bug in tornado? still there?
         'nbformat',
         'nbconvert',
         ########## "verify" stuff
