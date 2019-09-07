@@ -305,12 +305,8 @@ class Py2LineMagic(LineMagic):
 
     @staticmethod
     def _parse(x,i):
-# TODO: haven't done py2 yet
-#from IPython.core.inputtransformer2 import (
-#    ESC_MAGIC,
-        #magic_name, _, magic_arg_s = arg_s.partition(' ')
-        #magic_name = magic_name.lstrip(prefilter.ESC_MAGIC)
-        #return self.run_line_magic(magic_name, magic_arg_s, _stack_depth=2)        
+        # TODO (py2): should find and use ipython's own code for
+        # parsing instead (but py2 is going away...)
         bits = LineMagic._parse(x, 0).split(" ", 1)
         if i == 0:
             return bits[i]
