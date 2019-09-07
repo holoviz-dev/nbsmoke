@@ -76,13 +76,13 @@ configuration in setup.cfg, pytest.ini, or tox.ini::
     # defaults to ``^.*\.ipynb``
     it_is_nb_file = ^.*\.something$
 
-    # TODO regex flakes you don't want to hear about
+    # flakes you don't want to hear about (regex)
     nbsmoke_flakes_to_ignore = .*hvplot.* imported but unused.*
 
-    # TODO line magics to treat as being flakes
-    nbsmoke_flakes_line_magics_blacklist = matplotlib
+    # line magics to treat as being flakes (i.e. magics you don't want in your notebooks)
+    nbsmoke_flakes_line_magics_blacklist = pylab
 
-    # TODO cells magics to treat as being flakes
+    # cell magics to treat as being flakes (i.e. magics you don't want in your notebooks)
     nbsmoke_flakes_cell_magics_blacklist = bash
                                            ruby
 
@@ -92,7 +92,7 @@ should be ignored during lint checking.
 
 The ``nbsmoke_skip_run`` list in a project's config can be ignored by
 passing ``--ignore-nbsmoke-skip-run`` (useful if sometimes you want to
-run all notebooks).
+run all notebooks for a project where many are typically skipped).
 
 
 What's the point?
