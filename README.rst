@@ -53,6 +53,10 @@ Lint check notebooks::
 
     $ pytest --nbsmoke-lint
 
+Lint failures as warnings only::
+
+    $ pytest --nbsmoke-lint --nbsmoke-lint-onlywarn
+
 Instead of all files in a directory, you can specify a list e.g.::
 
     $ pytest --nbsmoke-run notebooks/Untitled*.ipynb
@@ -133,6 +137,10 @@ First, install using ``pip install -e .``. Then run the tests using
 
 New release to PyPI and anaconda.org: ``git tag -a vX.Y.Z -m
 "Something about release" && git push --tags``.
+
+Get some help to debug apparently incorrect flakes by adding
+``--nbsmoke-lint-debug``,
+e.g. ``pytest -v --nbsmoke-lint --nbsmoke-lint-debug examples``.
 
 
 License
