@@ -40,10 +40,10 @@ class LintNb(pytest.Item):
         with io.open(self.name,encoding='utf8') as nbfile:
             nb = nbformat.read(nbfile, as_version=4)
 
-            magics_thing = magics.Thing(
+            magics_processor = magics.Processor(
                 extra_line_blacklist = _get_list_from_conf('nbsmoke_flakes_line_magics_blacklist', self.parent.parent.config),
                 extra_cell_blacklist = _get_list_from_conf('nbsmoke_flakes_cell_magics_blacklist', self.parent.parent.config))
-            magics_thing.insert_get_ipython(nb)
+            magics_processor.insert_get_ipython(nb)
 
             ipy, _ = nbconvert.PythonExporter().from_notebook_node(nb)
 
@@ -52,7 +52,7 @@ class LintNb(pytest.Item):
 
             self._write_debug_file(debug, ipy, self.name, "pre", filenames)
 
-            py = magics_thing.ipython_to_python_for_flake_checks(ipy)
+            py = magics_processor.ipython_to_python_for_flake_checks(ipy)
 
             self._write_debug_file(debug, py, self.name, "post", filenames)
 
@@ -61,13 +61,13 @@ class LintNb(pytest.Item):
                 py.encode('utf8') if sys.version_info[0]==2 else py,
                 self.name)
 
-            ### remove flakes by regex
+            ### remove flakes by regex ###
             _user_flakes_to_ignore = self.parent.parent.config.getini('nbsmoke_flakes_to_ignore')
             if _user_flakes_to_ignore != '':
                 _user_flakes_to_ignore = _user_flakes_to_ignore.splitlines()
             for pattern in set(flakes_to_ignore) | set(_user_flakes_to_ignore):
                 flake_result['messages'] = [msg for msg in flake_result['messages'] if not re.search(pattern, msg)]
-            ###
+            ##############################
 
             if flake_result['messages']:
                 msg = "%s\n** "%self.name
@@ -84,11 +84,11 @@ class LintNb(pytest.Item):
                     raise NBLintError(msg)
 
     @staticmethod
-    def _write_debug_file(debug, py, name, what, filenames):
+    def _write_debug_file(debug, py, name, message, filenames):
         # hack to allow debugging of ipynb linting
         if debug:
             # should I use a temp file instead?
-            filename = os.path.splitext(name)[0]+".nbsmoke-debug-%smagicprocess.py"%what
+            filename = os.path.splitext(name)[0]+".nbsmoke-debug-%smagicprocess.py"%message
             with io.open(filename,'w',encoding='utf8') as df:
                 df.write(py)
             filenames.append(filename)

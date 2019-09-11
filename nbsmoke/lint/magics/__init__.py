@@ -96,7 +96,7 @@ for hmm in (builtins_support, holoviews_support):
     IGNORED_CELL_MAGICS.extend(hmm.IGNORED_CELL_MAGICS)
 
 # TODO: suddenly had to make some fns into a class to support blacklists; should rework.
-class Thing(object):
+class Processor(object):
 
     def __init__(self, extra_cell_blacklist=None, extra_line_blacklist=None):
         self.blacklisted_cell = (extra_cell_blacklist or []) + BLACKLISTED_CELL_MAGICS

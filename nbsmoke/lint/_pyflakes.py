@@ -4,7 +4,9 @@ addition"). Additions:
 
  * return more info for use by caller
 
- * support "noqa" in ipynb (of questionable value...)
+ * support "# noqa" comments in ipynb (to override flakes, e.g. if unused import is deliberate)
+
+ * support for blacklisted magics triggering flakes
 """
 
 import sys
