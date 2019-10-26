@@ -52,14 +52,14 @@ setup_args = dict(
         ########## "verify" stuff
         'requests',
         'beautifulsoup4',
-        ########## "extra magics" support
-        # TODO: will be removing the hv stuff
-        'holoviews'
     # TODO: I think the decision was to go with python/setup.py for this stuff,
     # right? (but if so, how do I specify it's the runtime python version
     # I'm talking aobut, not the buildtime python version?)
     # Also - not sure exactly what is required now
     ] + (['ipykernel'] if (sys.version_info[0]>=3 and sys.version_info[1]>4) else ['ipykernel <5']),
+    extras_require = {
+        'holoviews-magics': holoviews,
+    }
     entry_points={
         'pytest11': [
             'nbsmoke = nbsmoke',
