@@ -59,7 +59,7 @@ setup_args = dict(
     ] + (['ipykernel'] if (sys.version_info[0]>=3 and sys.version_info[1]>4) else ['ipykernel <5']),
     extras_require = {
         'holoviews-magics': holoviews,
-    }
+    },
     entry_points={
         'pytest11': [
             'nbsmoke = nbsmoke',
