@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/pyviz/nbsmoke.svg?branch=master
-    :target: https://travis-ci.org/pyviz/nbsmoke
+.. image:: https://travis-ci.org/pyviz-dev/nbsmoke.svg?branch=master
+    :target: https://travis-ci.org/pyviz-dev/nbsmoke
     :alt: See Build Status on Travis CI
 
 .. image:: https://ci.appveyor.com/api/projects/status/p93ot2kmae55pw3o/branch/master?svg=true
@@ -12,12 +12,6 @@ nbsmoke
 =======
 
 Basic notebook smoke tests: Do they run ok? Do they contain lint?
-
-**WARNING: early stage proof of concept; work in progress. Use at your
-own risk.**
-
-In particular, this extension is supposed to handle ipython magics as
-far as possible, but has not yet been widely tested.
 
 ----
 
