@@ -67,5 +67,7 @@ setup_args = dict(
     },
 )
 
+setup_args['extras_require']['all'] = sorted(set(sum(extras_require.values(), [])))
+
 if __name__=="__main__":
     setup(**setup_args)
