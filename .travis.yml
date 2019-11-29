@@ -21,8 +21,8 @@ jobs:
 
   - &default
     stage: test
-    python: 3.6
-    env: TOX_ENV=py36
+    python: 3.7
+    env: TOX_ENV=py37
     install:
       - pip install tox
     script:
@@ -35,6 +35,10 @@ jobs:
   - <<: *default
     python: 2.7
     env: TOX_ENV=py27
+
+  - <<: *default
+    python: 3.6
+    env: TOX_ENV=py36
 
   - <<: *default
     # like a python-using developer
