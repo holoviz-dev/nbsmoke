@@ -76,7 +76,7 @@ jobs:
   - &conda_default
     # like a conda-using developer
     stage: conda_test
-    python: 3.6
+    python: 3.7
     before_install:
       - pip install "pyct <0.2.1" && doit install_miniconda && rm -f .doit.db
       - export PATH="$HOME/miniconda/bin:$PATH"
