@@ -1,6 +1,5 @@
 # TODO: this has only been partially updated to use pyct
 
-sudo: false
 language: python
 
 stages:
@@ -85,11 +84,8 @@ jobs:
     install:
       - doit conda_develop_install_alternate --channel=conda-forge
     script:
+      - conda install holoviews
       - doit unit_tests
-
-#  - <<: *conda_default
-#    stage: conda_test
-#    python: 2.7
 
   - <<: *conda_default
     stage: conda_dev_package
