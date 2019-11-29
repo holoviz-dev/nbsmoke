@@ -12,6 +12,10 @@ def read(fname):
     file_path = os.path.join(os.path.dirname(__file__), fname)
     return codecs.open(file_path, encoding='utf-8').read()
 
+extras_require = {
+    'holoviews-magics': ['holoviews'],
+    'verify': ['requests', 'beautifulsoup4'],
+}
 
 setup_args = dict(
     name='nbsmoke',
@@ -54,10 +58,7 @@ setup_args = dict(
     # I'm talking aobut, not the buildtime python version?)
     # Also - not sure exactly what is required now
     ] + (['ipykernel'] if (sys.version_info[0]>=3 and sys.version_info[1]>4) else ['ipykernel <5']),
-    extras_require = {
-        'holoviews-magics': ['holoviews'],
-        'verify': ['requests', 'beautifulsoup4'],
-    },
+    extras_require = extras_require,
     entry_points={
         'pytest11': [
             'nbsmoke = nbsmoke',
