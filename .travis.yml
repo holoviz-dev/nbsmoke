@@ -41,6 +41,10 @@ jobs:
     env: TOX_ENV=py36
 
   - <<: *default
+    python: 3.8
+    env: TOX_ENV=py38
+
+  - <<: *default
     # like a python-using developer
     env: TOX_ENV=dev
 
