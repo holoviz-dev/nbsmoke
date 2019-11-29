@@ -34,7 +34,6 @@ test:
     {% endfor %}
   source_files:
     - tests
-    - test-notebooks
   commands:
     - pytest -v tests
 
