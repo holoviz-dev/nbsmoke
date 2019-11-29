@@ -84,7 +84,7 @@ jobs:
     install:
       - doit conda_develop_install_alternate --channel=conda-forge
     script:
-      - conda install holoviews
+      - conda install -y holoviews
       - doit unit_tests
 
   - <<: *conda_default
