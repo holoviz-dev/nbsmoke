@@ -42,7 +42,9 @@ def test_lint_bad_onlywarn(testdir):
     _args.append("--nbsmoke-lint-onlywarn")
     result = testdir.runpytest(*_args)
     assert result.ret == 0
-    assert result.parseoutcomes()['warnings'] == 1
+    # seems like this changed in pytest or something at some point!
+    warningkey = 'warnings' if 'warnings' in result.parseoutcomes() else 'warning'
+    assert result.parseoutcomes()[warningkey] == 1
     result.stdout.re_match_lines_random(
         [".*invalid syntax.*",
          ".*1/1 these undefined names are definitely undefined.*"])

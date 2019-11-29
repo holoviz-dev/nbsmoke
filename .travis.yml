@@ -1,6 +1,5 @@
 # TODO: this has only been partially updated to use pyct
 
-sudo: false
 language: python
 
 stages:
@@ -21,8 +20,8 @@ jobs:
 
   - &default
     stage: test
-    python: 3.6
-    env: TOX_ENV=py36
+    python: 3.7
+    env: TOX_ENV=py37
     install:
       - pip install tox
     script:
@@ -35,6 +34,14 @@ jobs:
   - <<: *default
     python: 2.7
     env: TOX_ENV=py27
+
+  - <<: *default
+    python: 3.6
+    env: TOX_ENV=py36
+
+  - <<: *default
+    python: 3.8
+    env: TOX_ENV=py38
 
   - <<: *default
     # like a python-using developer
@@ -68,7 +75,7 @@ jobs:
   - &conda_default
     # like a conda-using developer
     stage: conda_test
-    python: 3.6
+    python: 3.7
     before_install:
       - pip install "pyct <0.2.1" && doit install_miniconda && rm -f .doit.db
       - export PATH="$HOME/miniconda/bin:$PATH"
@@ -77,11 +84,8 @@ jobs:
     install:
       - doit conda_develop_install_alternate --channel=conda-forge
     script:
+      - conda install -y holoviews
       - doit unit_tests
-
-#  - <<: *conda_default
-#    stage: conda_test
-#    python: 2.7
 
   - <<: *conda_default
     stage: conda_dev_package

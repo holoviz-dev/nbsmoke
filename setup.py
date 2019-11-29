@@ -12,6 +12,10 @@ def read(fname):
     file_path = os.path.join(os.path.dirname(__file__), fname)
     return codecs.open(file_path, encoding='utf-8').read()
 
+extras_require = {
+    'holoviews-magics': ['holoviews'],
+    'verify': ['requests', 'beautifulsoup4'],
+}
 
 setup_args = dict(
     name='nbsmoke',
@@ -49,23 +53,20 @@ setup_args = dict(
         'jupyter_client',
         'nbformat',
         'nbconvert',
-        ########## "verify" stuff
-        'requests',
-        'beautifulsoup4',
-        ########## "extra magics" support
-        # TODO: will be removing the hv stuff
-        'holoviews'
     # TODO: I think the decision was to go with python/setup.py for this stuff,
     # right? (but if so, how do I specify it's the runtime python version
     # I'm talking aobut, not the buildtime python version?)
     # Also - not sure exactly what is required now
     ] + (['ipykernel'] if (sys.version_info[0]>=3 and sys.version_info[1]>4) else ['ipykernel <5']),
+    extras_require = extras_require,
     entry_points={
         'pytest11': [
             'nbsmoke = nbsmoke',
         ],
     },
 )
+
+setup_args['extras_require']['all'] = sorted(set(sum(extras_require.values(), [])))
 
 if __name__=="__main__":
     setup(**setup_args)
