@@ -431,7 +431,6 @@ def test_optional_import_warn(testdir):
     def not_clever_magics_handler(magic):
         raise ImportError("Amazing dependency is missing")
     import nbsmoke.lint.magics as M
-    from collections import namedtuple
     M.other_line_magic_handlers['clever_magic'] = not_clever_magics_handler
     ###
     result = testdir.runpytest(*lint_args)
