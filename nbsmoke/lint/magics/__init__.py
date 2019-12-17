@@ -170,7 +170,7 @@ def _call_a_handler(handlers, magic):
     try:
         return handlers[magic.name](magic)
     except ImportError as e:
-        raise ImportError("nbsmoke can't process the following '%s' magic without additional dependencies:\n  %s\n. Error was:\n  %s"%(magic.name, magic.line, e.msg))
+        raise ImportError("nbsmoke can't process the following '%s' magic without additional dependencies:\n  %s\n. Error was:\n  %s"%(magic.name, magic.line, e))
 
 def _process_magics(magic, other_magic_handlers, ignored_magics, blacklisted_magics, simple_magics=None):
     if simple_magics is None:
