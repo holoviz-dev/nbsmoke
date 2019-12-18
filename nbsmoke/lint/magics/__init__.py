@@ -30,9 +30,6 @@ except:
 from . import holoviews_support
 from . import builtins_support
 
-# as noted in that file, shouldn't be there but should just be replaced iwth something better anyway
-_Unavailable = holoviews_support._Unavailable
-
 # TODO: still nede to investigate the following line magics (and what
 # does ipython convert do to them?):
 #
@@ -170,11 +167,10 @@ def _get_parser(line): # yuck
     return parsers[None](line) # default/no magic
 
 def _call_a_handler(handlers, magic):
-    handler = handlers[magic.name]
-    if isinstance(handler, _Unavailable):
-        # this is a bit rubbish. and how to reconstruct original error?
-        raise Exception("nbsmoke can't process the following '%s' magic without additional dependencies:\n  %s\n. Error was:\n  %s"%(magic.name, magic.line, handler.e.msg))
-    return handler(magic)
+    try:
+        return handlers[magic.name](magic)
+    except ImportError as e:
+        raise ImportError("nbsmoke can't process the following '%s' magic without additional dependencies:\n  %s\n. Error was:\n  %s"%(magic.name, magic.line, e))
 
 def _process_magics(magic, other_magic_handlers, ignored_magics, blacklisted_magics, simple_magics=None):
     if simple_magics is None:

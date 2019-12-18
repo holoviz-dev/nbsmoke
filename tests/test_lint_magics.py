@@ -428,15 +428,16 @@ def test_optional_import_warn(testdir):
     testdir.makefile('.ipynb', testing123=nb_optional_dep)
     ###
     # what a hack
+    def not_clever_magics_handler(magic):
+        raise ImportError("Amazing dependency is missing")
     import nbsmoke.lint.magics as M
-    from collections import namedtuple
-    M.other_line_magic_handlers['clever_magic'] = M._Unavailable(namedtuple("SomeError", "msg")("A terrible error."))
+    M.other_line_magic_handlers['clever_magic'] = not_clever_magics_handler
     ###
     result = testdir.runpytest(*lint_args)
     assert result.ret == 1
     result.stdout.re_match_lines_random(
-        [".*Exception: nbsmoke can't process the following 'clever_magic' magic without additional dependencies.*",
-         ".*A terrible error.*"])
+        [".*ImportError: nbsmoke can't process the following 'clever_magic' magic without additional dependencies.*",
+         ".*Amazing dependency is missing.*"])
 
 
 def test_lint_line_magics_indent(testdir):
