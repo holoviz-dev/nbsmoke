@@ -48,6 +48,11 @@ jobs:
     env: TOX_ENV=dev
 
   - <<: *default
+    # measuring coverage of a pytest plugin using pytest-cov is slightly awkward,
+    # so we have a separate step for it
+    env: TOX_ENV=coverage
+
+  - <<: *default
     stage: pip_package
     install: true
     script: true

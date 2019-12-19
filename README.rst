@@ -6,6 +6,9 @@
     :target: https://ci.appveyor.com/project/pyviz/nbsmoke/branch/master
     :alt: See Build Status on AppVeyor
 
+.. image:: https://coveralls.io/repos/github/pyviz-dev/nbsmoke/badge.svg?branch=master
+    :target: https://coveralls.io/github/pyviz-dev/nbsmoke?branch=master
+    :alt: See coverage stats on Coveralls
 
 =======
 nbsmoke
