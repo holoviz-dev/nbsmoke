@@ -17,6 +17,18 @@ import pytest
 
 class VerifyNb(pytest.Item):
     def runtest(self):
+
+        ###################################################
+        # quick hacks to handle missing optional modules
+        _missing = []
+        if BeautifulSoup is None:
+            _missing.append("  * BeautifulSoup not available - please install beautifulsoup4")
+        if requests is None:
+            _missing.append("  * requests not available - please install requests")
+        if _missing:
+            raise Exception("nbsmoke verify failed to execute because of missing modules:\n"+"\n".join(_missing))
+        ###################################################        
+        
         filename = self.name
 
         bad_modules = check_modules(filename)
@@ -31,6 +43,17 @@ class VerifyNb(pytest.Item):
             warnings.warn("%s:\n***** invalid modules: %s\n\n***** bad links: %s\n\n***** bad images: %s\n\n"%(filename,bad_modules,bad_links,bad_images) + "-"*20)
 
 
+try:
+    import requests, requests.exceptions
+except:
+    requests = None
+
+try:
+    from bs4 import BeautifulSoup
+except:
+    # TODO: capture or log the error
+    BeautifulSoup = None
+            
 ###################################################
 ###################################################
 # rest of this file is quickly copied in code from datashader
@@ -41,10 +64,6 @@ class VerifyNb(pytest.Item):
 # complains that
 # https://www.earthsystemcog.org/projects/esmf/regridding is a bad
 # link).
-
-
-import requests, requests.exceptions
-from bs4 import BeautifulSoup
 
 def export_as_html(filename):
     html_exporter = nbconvert.HTMLExporter()
@@ -123,3 +142,4 @@ def check_urls(notebook, name, attribute):
             bad_urls.add(url)
 
     return bad_urls
+
