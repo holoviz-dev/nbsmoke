@@ -43,6 +43,7 @@ class VerifyNb(pytest.Item):
             warnings.warn("%s:\n***** invalid modules: %s\n\n***** bad links: %s\n\n***** bad images: %s\n\n"%(filename,bad_modules,bad_links,bad_images) + "-"*20)
 
 
+# TODO: capture or log the import errors
 try:
     import requests, requests.exceptions
 except:
@@ -51,7 +52,6 @@ except:
 try:
     from bs4 import BeautifulSoup
 except:
-    # TODO: capture or log the error
     BeautifulSoup = None
             
 ###################################################
