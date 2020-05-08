@@ -1,3 +1,6 @@
+import pytest
+holoviews = pytest.importorskip("holoviews", reason="HoloViews is required to test hv magics.")
+
 from . import lint_args
 
 # otherwise stuff from the bowels of pandas and numpy comes up
