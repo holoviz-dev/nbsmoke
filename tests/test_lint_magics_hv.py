@@ -1,4 +1,10 @@
+import pytest
+holoviews = pytest.importorskip("holoviews", reason="HoloViews is required to test hv magics.")
+
 from . import lint_args
+
+# otherwise stuff from the bowels of pandas and numpy comes up
+lint_args = lint_args + ['-W ignore::RuntimeWarning']
 
 nb_hv_good = u'''
 {
