@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from . import nb_basic
-
 def test_help_message(testdir):
     result = testdir.runpytest(
         '--help',

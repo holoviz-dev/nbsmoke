@@ -4,8 +4,6 @@
 # is removed.
 
 import os
-import io
-import sys
 import shutil
 
 from . import nb_basic, run_args
