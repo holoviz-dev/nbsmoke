@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys
+
 import os
 import codecs
 from setuptools import setup, find_packages
