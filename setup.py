@@ -48,7 +48,7 @@ setup_args = dict(
         # * Required imports: nbconvert, nbformat.
         # * Optional: process ipython magics (required import: IPython)
         'nbformat',
-        'nbconvert',
+        'nbconvert'],
     extras_require = extras_require,
     entry_points={
         'pytest11': [
