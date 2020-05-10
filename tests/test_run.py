@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+# TODO: run is deprecated - will be able to remove when --nbsmoke-run
+# is removed.
+
 import os
 import io
 import sys
@@ -22,37 +25,18 @@ def test_run_good(testdir):
     result = testdir.runpytest(*run_args)
     assert result.ret == 0
     result.stdout.re_match_lines_random(
-        [".*collected 1 item$",
-         ".*testing123.ipynb.*PASSED.*"])
+        [".*collected 4 items$",
+         ".*testing123::ipynb::Cell 0 PASSED.*",
+         ".*testing123::ipynb::Cell 1 PASSED.*",
+         ".*testing123::ipynb::Cell 2 PASSED.*",
+         ".*testing123::ipynb::Cell 3 PASSED.*",
+        ])
 
 def test_run_bad(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/0"})
     result = testdir.runpytest(*run_args)
     assert result.ret == 1
     result.stdout.re_match_lines_random([".*ZeroDivisionError.*"])
-
-def test_run_good_html(testdir):
-    outhtml = os.path.join(testdir.tmpdir.strpath,'testing123.ipynb.html')
-    assert not os.path.exists(outhtml)
-
-    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"42"})
-
-    result = testdir.runpytest(*(run_args+['--store-html=%s'%testdir.tmpdir.strpath]))
-    assert result.ret == 0
-
-    # test that html has happened
-    targets = [
-        "<pre>42</pre>",
-                                               # note: this is really what happens in a python2 notebook
-        "<pre>&#39;中国&#39;</pre>" if sys.version_info[0]==3 else r"<pre>u&#39;\u4e2d\u56fd&#39;</pre>"]
-    answer = [None,None]
-
-    with io.open(outhtml,encoding='utf8') as f:
-        for line in f:
-            for i,target in enumerate(targets):
-                if target in line:
-                    answer[i] = 42
-    assert answer == [42,42]
 
 
 def test_skip_run(testdir):
@@ -68,11 +52,23 @@ def test_skip_run(testdir):
     result = testdir.runpytest(*run_args)
     assert result.ret == 0
     result.stdout.re_match_lines_random(
-        [".*collected 4 items$",
-         ".*alsoskipme.ipynb.*SKIPPED",
-         ".*skipme.ipynb.*SKIPPED",
-         ".*skipmenot.ipynb.*PASSED",
-         ".*skipmetoo.ipynb.*SKIPPED"])
+        [".*collected 16 items$",
+         ".*alsoskipme::ipynb.*SKIPPED",
+         ".*alsoskipme::ipynb::Cell 1 SKIPPED",
+         ".*alsoskipme::ipynb::Cell 2 SKIPPED",
+         ".*alsoskipme::ipynb::Cell 3 SKIPPED",
+         ".*skipme::ipynb::Cell 0 SKIPPED",
+         ".*skipme::ipynb::Cell 1 SKIPPED",
+         ".*skipme::ipynb::Cell 2 SKIPPED",
+         ".*skipme::ipynb::Cell 3 SKIPPED",         
+         ".*skipmenot::ipynb::Cell 0 PASSED",
+         ".*skipmenot::ipynb::Cell 1 PASSED",
+         ".*skipmenot::ipynb::Cell 2 PASSED",
+         ".*skipmenot::ipynb::Cell 3 PASSED",         
+         ".*skipmetoo::ipynb::Cell 0 SKIPPED",
+         ".*skipmetoo::ipynb::Cell 1 SKIPPED",
+         ".*skipmetoo::ipynb::Cell 2 SKIPPED",
+         ".*skipmetoo::ipynb::Cell 3 SKIPPED"])
 
 def test_cwd_like_jupyter_notebook(testdir):
     p = testdir.tmpdir.mkdir("sub").join("hello.txt")
