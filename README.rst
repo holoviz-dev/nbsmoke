@@ -92,8 +92,8 @@ simple promise: it will never complain about style, and it will try
 very, very hard to never emit false positives."
 
 
-Unsupported usage
------------------
+Deprecated usage
+----------------
 
 nbsmoke used to support checking that notebooks run without error, and
 could save the generated html.  However, we now recommend using nbval
