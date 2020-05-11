@@ -102,7 +102,7 @@ def pytest_collect_file(path, parent):
         skip_patterns = parent.config.getini('nbsmoke_skip_run')
         if skip_patterns.strip() != '':
             if not '--ignore-nbsmoke-skip-run' in sys.argv:
-                raise ValueError("nbsmoke_skip_run regex no longer supported; use pytest one of pytest's own options instead: -k, --ignore, --ignore-glob, conftest.py."
+                raise ValueError("nbsmoke_skip_run regex no longer supported; use pytest one of pytest's own options instead: -k, --ignore, --ignore-glob, conftest.py.")
         
         return nbval.plugin.IPyNbFile(path, parent)
     
