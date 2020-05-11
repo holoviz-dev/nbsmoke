@@ -48,20 +48,20 @@ def pytest_addoption(parser):
 
     ##################
     ### DEPRECATED ###
+    # remove in 0.6
     group.addoption(
         '--nbsmoke-run',
         action="store_true",
-        help="**DEPRECATED: Use --nbval-lax instead** Run notebooks using nbconvert to check for exceptions.")
+        help="**DEPRECATED: Use nbval instead** Run notebooks using nbconvert to check for exceptions.")
 
-    # TODO!
-    parser.addini('nbsmoke_cell_timeout', "nbsmoke's nbconvert cell timeout")
+    parser.addini('nbsmoke_cell_timeout', "**DEPRECATED: Use nbval instead** nbsmoke's nbconvert cell timeout")
 
     # TODO: hacks to work around pyviz team desire to not use pytest's markers
-    parser.addini('nbsmoke_skip_run', '**DEPRECATED: something something!** re to skip (multi-line; one pattern per line)')
+    parser.addini('nbsmoke_skip_run', '**DEPRECATED: Use a pytest option such as --ignore, --ignore-glob, -k, or conftest.py** re to skip (multi-line; one pattern per line)')
     group.addoption(
         '--ignore-nbsmoke-skip-run',
         action="store_true",
-        help="**DEPRECATED: something something!** Ignore any skip list in the ini file (allows to run all nbs if desired)")
+        help="**DEPRECATED: Use a pytest option such as --ignore, --ignore-glob, -k, or conftest.py** Ignore any skip list in the ini file (allows to run all nbs if desired)")
     ####
     ##################
     
@@ -81,18 +81,29 @@ def pytest_collect_file(path, parent):
 
     opt = parent.config.option
 
-    # you have to pick one - can't currently run and lint and verify
-    # (though you should be able to)
+    # TODO: you have to pick one - can't currently run and lint and
+    # verify (though you should be able to)
     
     if opt.nbsmoke_run:
-        import nbval.plugin        
-        # TODO: emit a deprecation warning
-        _skip_patterns = parent.config.getini('nbsmoke_skip_run')
-        # if skip_patterns: emit another deprecation warning!
-        if opt.ignore_nbsmoke_skip_run:
-            # TODO: emit another deprecation warning!!
-            _skip_patterns = []
-        nbval.plugin.IPyNbFile._skip_patterns = _skip_patterns
+        import warnings
+        warnings.warn("--nbsmoke-run is deprecated: please use nbval (--nbval-lax) instead.", DeprecationWarning)
+
+        import sys
+        import nbval.plugin
+
+        if '--current-env' not in sys.argv:
+            opt.current_env = True
+
+        if '--nbval-cell-timeout' not in sys.argv:
+            timeout = parent.config.getini('nbsmoke_cell_timeout')
+            if timeout != '':
+                opt.nbval_cell_timeout = timeout
+
+        skip_patterns = parent.config.getini('nbsmoke_skip_run')
+        if skip_patterns.strip() != '':
+            if not '--ignore-nbsmoke-skip-run' in sys.argv:
+                raise ValueError("nbsmoke_skip_run regex no longer supported; use pytest one of pytest's own options instead: -k, --ignore, --ignore-glob, conftest.py."
+        
         return nbval.plugin.IPyNbFile(path, parent)
     
     elif opt.nbsmoke_lint:

@@ -49,7 +49,7 @@ If you want to restrict pytest to running only your notebook tests, use `-k`, e.
     $ pytest --nbsmoke-lint -k ".ipynb"
 
 TODO: add ``--nbsmoke-verify`` docs!
-    
+
 Additional options are available by standard pytest 'ini'
 configuration in setup.cfg, pytest.ini, or tox.ini::
 
@@ -92,44 +92,76 @@ simple promise: it will never complain about style, and it will try
 very, very hard to never emit false positives."
 
 
-Deprecated Usage
-----------------
+Unsupported usage
+-----------------
 
 nbsmoke used to support checking that notebooks run without error, and
 could save the generated html.  However, we now recommend using nbval
-instead. ``--nbsmoke-run`` is still available, but just calls nbval;
-eventually all options related to ``--nbsmoke-run`` will be removed from
-nbsmoke.
+instead. ``--nbsmoke-run`` is still available, but it just calls
+nbval; eventually all options related to ``--nbsmoke-run`` will be
+removed from nbsmoke.
 
-Old...Check all notebooks run without errors::
+Before (deprecated)---check all notebooks run without errors::
 
     $ pytest --nbsmoke-run
 
-New...Use nbval instead::
+After---use nbval instead::
 
     $ pytest --nbval-lax
 
-Old stuff...
-    
-If you want to restrict pytest to running only your notebook tests, use `-k`, e.g.::
 
-    $ pytest --nbsmoke-run -k ".ipynb"
+Note about kernel used to run notebook
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Additional options are available by standard pytest 'ini'
-configuration in setup.cfg, pytest.ini, or tox.ini::
+By default, nbsmoke used the current environment's kernel, whereas
+nbval uses the kernel stored in the notebook by default. To obtain
+nbsmoke's behavior, pass ``--current-env``. See also:
+https://github.com/computationalmodelling/nbval/issues/140
+
+
+Cell timeout
+~~~~~~~~~~~~
+
+Before (deprecated)---pytest configuration options in setup.cfg,
+pytest.ini, or tox.ini::
 
     [pytest]
     # when running, seconds allowed per cell (see nbconvert timeout)
     nbsmoke_cell_timeout = 600
+
+
+After---nbval has the ``--nbval-cell-timeout`` option. Specify at the
+command line, or add to pytest's options (in one of the above files)::
+
+    [pytest]
+    addopts = --nbval-cell-timeout=600
+
+
+Skipping notebooks
+~~~~~~~~~~~~~~~~~~
+
+Before (no longer supported)::
 
     # notebooks to skip running; one case insensitive re to match per line
     nbsmoke_skip_run = ^.*skipme\.ipynb$
                        ^.*skipmetoo.*$
 
 
-The ``nbsmoke_skip_run`` list in a project's config can be ignored by
-passing ``--ignore-nbsmoke-skip-run`` (useful if sometimes you want to
-run all notebooks for a project where many are typically skipped).
+After---use pytest's own test selection and skipping
+functionality. You can ignore certain files using ``--ignore`` or
+``--ignore-glob`` at the command line, or add to pytest's options (in
+one of the above files)::
+
+    [pytest]
+    addopts = --ignore=path/to/skipme.ipynb
+              --ignore=path/of/skipmetoo.ipynb
+
+
+Alternatively, for more complex scenarios or to explicitly get "skip"
+in your test results, see pytest's ``-k`` option or use a
+``conftest.py`` file. nbsmoke has an example of using ``conftest.py``
+in its own test suite (``test_skip_run`` in
+https://github.com/pyviz-dev/nbsmoke/blob/master/tests/test_run.py).
 
 
 Contributing
