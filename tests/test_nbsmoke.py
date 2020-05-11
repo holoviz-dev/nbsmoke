@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from . import nb_basic
-
 def test_help_message(testdir):
     result = testdir.runpytest(
         '--help',
     )
     result.stdout.fnmatch_lines([
         'nbsmoke:',
-        '*--nbsmoke-run*',
         '*--nbsmoke-lint*',
+        '*--nbsmoke-lint-debug*',        
         '*--nbsmoke-lint-onlywarn*',
         '*--nbsmoke-verify*',
-        '*--store-html*'
+        '*--nbsmoke-run*',
+        '*--ignore-nbsmoke-skip-run*',        
     ])
 
 
@@ -40,14 +39,3 @@ def test_nbsmoke_cell_timeout_ini_setting(testdir):
     ])
 
     assert result.ret == 0
-
-    
-def test_it_is_nbfile(testdir):
-    testdir.makeini(r"""
-        [pytest]
-        it_is_nb_file = ^.*\.something$
-    """)
-    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/0"})
-    result = testdir.runpytest('--nbsmoke-run','-v')
-    assert result.ret == 5
-    result.stdout.fnmatch_lines(['*collected 0 items*'])

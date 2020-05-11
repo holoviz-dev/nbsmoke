@@ -14,12 +14,7 @@
 nbsmoke
 =======
 
-Basic notebook smoke tests: Do they run ok? Do they contain lint?
-
-----
-
-This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`_'s `Cookiecutter-pytest-plugin`_ template.
-
+Static checking of notebooks (e.g. do they contain lint?)
 
 
 Installation
@@ -29,22 +24,13 @@ You can install nbsmoke via `pip`_ from `PyPI`_::
 
     $ pip install nbsmoke
 
-Or you can install nbsmoke via `conda`_ from `anaconda.org`_::
+Or via `conda`_ from `anaconda.org`_::
 
-    $ conda install -c pyviz/label/dev -c conda-forge nbsmoke
+    $ conda install nbsmoke
 
 
 Usage
 -----
-
-Check all notebooks run without errors::
-
-    $ pytest --nbsmoke-run
-
-Check all notebooks run without errors, and store html to look at
-afterwards::
-
-    $ pytest --nbsmoke-run --store-html=/scratch
 
 Lint check notebooks::
 
@@ -56,27 +42,18 @@ Lint failures as warnings only::
 
 Instead of all files in a directory, you can specify a list e.g.::
 
-    $ pytest --nbsmoke-run notebooks/Untitled*.ipynb
+    $ pytest --nbsmoke-lint notebooks/Untitled*.ipynb
 
 If you want to restrict pytest to running only your notebook tests, use `-k`, e.g.::
 
-    $ pytest --nbsmoke-run -k ".ipynb"
+    $ pytest --nbsmoke-lint -k ".ipynb"
+
+TODO: add ``--nbsmoke-verify`` docs!
 
 Additional options are available by standard pytest 'ini'
 configuration in setup.cfg, pytest.ini, or tox.ini::
 
     [pytest]
-    # when running, seconds allowed per cell (see nbconvert timeout)
-    nbsmoke_cell_timeout = 600
-
-    # notebooks to skip running; one case insensitive re to match per line
-    nbsmoke_skip_run = ^.*skipme\.ipynb$
-                       ^.*skipmetoo.*$
-
-    # case insensitive re to match for file to be considered notebook;
-    # defaults to ``^.*\.ipynb``
-    it_is_nb_file = ^.*\.something$
-
     # flakes you don't want to hear about (regex)
     nbsmoke_flakes_to_ignore = .*hvplot.* imported but unused.*
 
@@ -91,30 +68,19 @@ configuration in setup.cfg, pytest.ini, or tox.ini::
 nbsmoke supports ``# noqa`` comments to mark that something
 should be ignored during lint checking.
 
-The ``nbsmoke_skip_run`` list in a project's config can be ignored by
-passing ``--ignore-nbsmoke-skip-run`` (useful if sometimes you want to
-run all notebooks for a project where many are typically skipped).
-
 
 What's the point?
 -----------------
 
-Although more sophisticated testing of notebooks is possible (e.g. see
-nbval), just checking that notebooks run from start to finish without
-error in a fresh kernel (or on a neutral CI service) can be useful
-during development. Practical experience of working on several
-projects with notebooks confirms this, but that's all the evidence I
-have.
+Checking notebooks for lint can find things like undefined names
+faster than by running them.
 
-Checking notebooks for lint might seem trivial/pointless, but it
-frequently uncovers unused names (typically unused imports). It's also
-quite common to find python 2 vs 3 problems, and sometimes undefined
-names - in a way that's faster than running the notebook (over
-multiple versions of python).
+TODO: be able to switch linter? Or explicitly call the "lint"
+pyflakes.
 
-Unused imports/names themselves might seem trivial, but they can
-hinder understanding of a notebook by readers, or add dependencies
-that are not required.
+Things that aren't errors, such as unused imports/names, might seem
+trivial, but they can hinder understanding of a notebook by readers,
+or add dependencies that are not required.
 
 Hopefully you don't have mysterious (unused) imports in your notebook,
 but if you do, you can add ``# noqa: explanation`` to stop flake
@@ -124,6 +90,78 @@ very helpful to inform the reader of that.
 Pyflakes is used as the underlying linter because "Pyflakes makes a
 simple promise: it will never complain about style, and it will try
 very, very hard to never emit false positives."
+
+
+Deprecated usage
+----------------
+
+nbsmoke used to support checking that notebooks run without error, and
+could save the generated html.  However, we now recommend using nbval
+instead. ``--nbsmoke-run`` is still available, but it just calls
+nbval; eventually all options related to ``--nbsmoke-run`` will be
+removed from nbsmoke.
+
+Before (deprecated)---check all notebooks run without errors::
+
+    $ pytest --nbsmoke-run
+
+After---use nbval instead::
+
+    $ pytest --nbval-lax
+
+
+Note about kernel used to run notebook
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, nbsmoke used the current environment's kernel, whereas
+nbval uses the kernel stored in the notebook by default. To obtain
+nbsmoke's behavior, pass ``--current-env``. See also:
+https://github.com/computationalmodelling/nbval/issues/140
+
+
+Cell timeout
+~~~~~~~~~~~~
+
+Before (deprecated)---pytest configuration options in setup.cfg,
+pytest.ini, or tox.ini::
+
+    [pytest]
+    # when running, seconds allowed per cell (see nbconvert timeout)
+    nbsmoke_cell_timeout = 600
+
+
+After---nbval has the ``--nbval-cell-timeout`` option. Specify at the
+command line, or add to pytest's options (in one of the above files)::
+
+    [pytest]
+    addopts = --nbval-cell-timeout=600
+
+
+Skipping notebooks
+~~~~~~~~~~~~~~~~~~
+
+Before (no longer supported)::
+
+    # notebooks to skip running; one case insensitive re to match per line
+    nbsmoke_skip_run = ^.*skipme\.ipynb$
+                       ^.*skipmetoo.*$
+
+
+After---use pytest's own test selection and skipping
+functionality. You can ignore certain files using ``--ignore`` or
+``--ignore-glob`` at the command line, or add to pytest's options (in
+one of the above files)::
+
+    [pytest]
+    addopts = --ignore=path/to/skipme.ipynb
+              --ignore=path/of/skipmetoo.ipynb
+
+
+Alternatively, for more complex scenarios or to explicitly get "skip"
+in your test results, see pytest's ``-k`` option or use a
+``conftest.py`` file. nbsmoke has an example of using ``conftest.py``
+in its own test suite (``test_skip_run`` in
+https://github.com/pyviz-dev/nbsmoke/blob/master/tests/test_run.py).
 
 
 Contributing
@@ -153,11 +191,8 @@ Issues
 If you encounter any problems, please `file an issue`_ (ideally
 including a copy of any problematic notebook).
 
-.. _`Cookiecutter`: https://github.com/audreyr/cookiecutter
-.. _`@hackebrot`: https://github.com/hackebrot
 .. _`BSD-3`: http://opensource.org/licenses/BSD-3-Clause
-.. _`cookiecutter-pytest-plugin`: https://github.com/pytest-dev/cookiecutter-pytest-plugin
-.. _`file an issue`: https://github.com/pyviz/nbsmoke/issues
+.. _`file an issue`: https://github.com/pyviz-dev/nbsmoke/issues
 .. _`pytest`: https://github.com/pytest-dev/pytest
 .. _`tox`: https://tox.readthedocs.io/en/latest/
 .. _`pip`: https://pypi.python.org/pypi/pip/
