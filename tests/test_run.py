@@ -36,13 +36,21 @@ def test_run_bad(testdir):
     assert result.ret == 1
     result.stdout.re_match_lines_random([".*ZeroDivisionError.*"])
 
-
 def test_skip_run(testdir):
-    testdir.makeini(r"""
-        [pytest]
-        nbsmoke_skip_run = ^.*skipme\.ipynb$
-                           ^.*skipmetoo.*$
+    testdir.makeconftest("""
+    import pytest
+    import re
+    
+    skip_patterns = [".*skipme\.ipynb.*",
+                     ".*skipmetoo.*"]
+    
+    def pytest_runtest_setup(item):
+        for pattern in skip_patterns:
+            if re.match(pattern, item.nodeid):
+                pytest.skip("Skipped by conftest")
+                break
     """)
+
     testdir.makefile('.ipynb', skipme=nb_basic%{'the_source':"1/0"})
     testdir.makefile('.ipynb', alsoskipme=nb_basic%{'the_source':"1/0"})
     testdir.makefile('.ipynb', skipmetoo=nb_basic%{'the_source':"1/0"})
