@@ -164,6 +164,6 @@ def pytest_collect_file(path, parent):
                 dowhat = VerifyNb
 
             if hasattr(IPyNbFile, "from_parent"):
-                return IPyNbFile.from_parent(parent, fspath=path)
+                return IPyNbFile.from_parent(parent, fspath=path, dowhat=dowhat)
             
             return IPyNbFile(path, parent, dowhat=dowhat)
