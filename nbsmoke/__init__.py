@@ -140,7 +140,10 @@ class IPyNbFile(pytest.File):
         super(IPyNbFile,self).__init__(fspath, parent=parent, config=None, session=None)
 
     def collect(self):
-        yield self._dowhat(str(self.fspath), self)
+        if hasattr(self._dowhat, "from_parent"):
+            yield self._dowhat.from_parent(parent, fspath=path)
+        else:
+            yield self._dowhat(str(self.fspath), self)
 
 
 def pytest_collect_file(path, parent):
