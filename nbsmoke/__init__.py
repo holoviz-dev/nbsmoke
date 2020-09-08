@@ -162,4 +162,8 @@ def pytest_collect_file(path, parent):
                 dowhat = LintNb
             elif opt.nbsmoke_verify:
                 dowhat = VerifyNb
+
+            if hasattr(IPyNbFile, "from_parent"):
+                return IPyNbFile.from_parent(parent, fspath=path)
+            
             return IPyNbFile(path, parent, dowhat=dowhat)
