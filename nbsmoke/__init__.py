@@ -141,7 +141,7 @@ class IPyNbFile(pytest.File):
 
     def collect(self):
         if hasattr(self._dowhat, "from_parent"):
-            yield self._dowhat.from_parent(parent, fspath=path)
+            yield self._dowhat.from_parent(self, fspath=self.fspath)
         else:
             yield self._dowhat(str(self.fspath), self)
 
