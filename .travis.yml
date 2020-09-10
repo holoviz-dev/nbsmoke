@@ -6,7 +6,7 @@ stages:
   - name: test_latest_release
     if: type = cron
   - name: pip_package
-    if: tag =~ ^v(\d+|\.)*$
+    if: tag =~ ^v(\d)(\d|\.)*
 
 jobs:
   include:
