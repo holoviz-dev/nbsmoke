@@ -101,9 +101,10 @@ class Processor(object):
         self.extra_cell_magic_handlers = dict(other_cell_magic_handlers)
         self.extra_line_magic_handlers = dict(other_line_magic_handlers)
 
-        user_cell_magic_handlers, user_line_magic_handlers = self._load_user_magic_handlers(extra_magic_handlers)
-        self.extra_cell_magic_handlers.update(user_cell_magic_handlers)
-        self.extra_line_magic_handlers.update(user_line_magic_handlers)
+        if extra_magic_handlers:
+            user_cell_magic_handlers, user_line_magic_handlers = self._load_user_magic_handlers(extra_magic_handlers)
+            self.extra_cell_magic_handlers.update(user_cell_magic_handlers)
+            self.extra_line_magic_handlers.update(user_line_magic_handlers)
 
 
     @staticmethod
