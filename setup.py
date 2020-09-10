@@ -50,7 +50,7 @@ setup_args = dict(
         # * Required imports: nbconvert, nbformat.
         # * Need to be able to execute ipython notebooks.
         # * Optional: process ipython magics (required import: IPython)
-        'jupyter_client ==6.1.3',
+        'jupyter_client ==6.1.2',
         'nbformat',
         'nbconvert',
     # TODO: I think the decision was to go with python/setup.py for this stuff,
