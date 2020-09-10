@@ -25,10 +25,6 @@ jobs:
     env: TOX_ENV=flake8
 
   - <<: *default
-    python: 2.7
-    env: TOX_ENV=py27
-
-  - <<: *default
     python: 3.6
     env: TOX_ENV=py36
 
