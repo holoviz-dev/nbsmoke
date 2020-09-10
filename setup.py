@@ -52,7 +52,7 @@ setup_args = dict(
         'jupyter_client',
         'nbformat',
         'nbconvert <6',
-        'ipykernel']
+        'ipykernel'],
     extras_require = extras_require,
     entry_points={
         'pytest11': [
