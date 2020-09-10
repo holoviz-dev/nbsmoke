@@ -55,19 +55,6 @@ jobs:
       user: ceball
       password: $PYPI_PWD
 
-  - <<: *default
-    stage: pip_dev_package
-    install: true
-    script: true
-    deploy:
-      provider: pypi
-      server: https://test.pypi.org/legacy/
-      distributions: "sdist bdist_wheel"
-      on:
-        tags: true
-      user: ceball
-      password: $PYPI_PWD
-
   # TODO: don't need to clone the repo
   - stage: test_latest_release
     python: 3.7
