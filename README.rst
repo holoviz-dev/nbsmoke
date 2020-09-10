@@ -19,7 +19,7 @@
     :alt: Build Status on Travis CI (Linux)
 
 .. image:: https://ci.appveyor.com/api/projects/status/jsnhyaf1jqtcsc9a/branch/master?svg=true
-    :target: https://ci.appveyor.com/project/ceball/nbsmoke
+    :target: https://ci.appveyor.com/project/ceball/nbsmoke/branch/master
     :alt: Build Status on AppVeyor (Windows)
 
 .. image:: https://coveralls.io/repos/github/pyviz-dev/nbsmoke/badge.svg?branch=master
