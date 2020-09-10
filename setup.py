@@ -50,9 +50,9 @@ setup_args = dict(
         # * Required imports: nbconvert, nbformat.
         # * Need to be able to execute ipython notebooks.
         # * Optional: process ipython magics (required import: IPython)
-        'jupyter_client ==6.1.2',
+        'jupyter_client',
         'nbformat',
-        'nbconvert',
+        'nbconvert <6',
     # TODO: I think the decision was to go with python/setup.py for this stuff,
     # right? (but if so, how do I specify it's the runtime python version
     # I'm talking aobut, not the buildtime python version?)
