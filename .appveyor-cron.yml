@@ -1,0 +1,16 @@
+# TODO don't need to clone repo
+
+environment:
+  matrix:
+    - PYTHON: "C:\\Python37"
+
+install:
+  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - python --version
+  - python -m pip install nbsmoke
+
+build: off
+
+test_script:
+  # TODO update to run test suite when tests are in nbsmoke package
+  - python -c "import nbsmoke"

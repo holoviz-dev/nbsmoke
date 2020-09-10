@@ -3,6 +3,8 @@ language: python
 stages:
   - lint
   - test
+  - name: test_latest_release
+    if: type = cron
   - name: pip_dev_package
     if: tag =~ ^v(\d+|\.)*[a-z]\d*$
   - name: pip_package
@@ -65,3 +67,12 @@ jobs:
         tags: true
       user: ceball
       password: $PYPI_PWD
+
+  # TODO: don't need to clone the repo
+  - stage: test_latest_release
+    python: 3.7
+    install:
+      - pip install nbsmoke
+    script:
+      # TODO: when pytest's tests are in the package, run the tests!
+      - python -c "import nbsmoke"
