@@ -1,10 +1,26 @@
+.. image:: https://img.shields.io/pypi/v/nbsmoke
+    :target: https://pypi.org/project/nbsmoke/
+    :alt: PyPI
+	   
+.. image:: https://pepy.tech/badge/nbsmoke
+    :target: https://pepy.tech/project/nbsmoke
+    :alt: PyPI Downloads
+
+.. image:: https://img.shields.io/conda/vn/conda-forge/nbsmoke
+    :target: https://anaconda.org/conda-forge/nbsmoke/
+    :alt: conda-forge
+
+.. image:: https://img.shields.io/conda/dn/conda-forge/nbsmoke.svg?label=conda-forge
+    :target: https://anaconda.org/conda-forge/nbsmoke/
+    :alt: conda-forge downloads
+	  
 .. image:: https://travis-ci.org/pyviz-dev/nbsmoke.svg?branch=master
     :target: https://travis-ci.org/pyviz-dev/nbsmoke
-    :alt: See Build Status on Travis CI
+    :alt: Build Status on Travis CI (Linux)
 
-.. image:: https://ci.appveyor.com/api/projects/status/p93ot2kmae55pw3o/branch/master?svg=true
-    :target: https://ci.appveyor.com/project/pyviz/nbsmoke/branch/master
-    :alt: See Build Status on AppVeyor
+.. image:: https://ci.appveyor.com/api/projects/status/jsnhyaf1jqtcsc9a/branch/master?svg=true
+    :target: https://ci.appveyor.com/project/ceball/nbsmoke/branch/master
+    :alt: Build Status on AppVeyor (Windows)
 
 .. image:: https://coveralls.io/repos/github/pyviz-dev/nbsmoke/badge.svg?branch=master
     :target: https://coveralls.io/github/pyviz-dev/nbsmoke?branch=master
