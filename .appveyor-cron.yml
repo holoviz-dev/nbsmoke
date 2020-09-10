@@ -2,10 +2,11 @@
 
 environment:
   matrix:
-    - PY: "3.7"
+    - PYTHON: "C:\\Python37"
 
 install:
-  - "pip install nbsmoke"
+  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - python -m pip install nbsmoke
 
 build: off
 
