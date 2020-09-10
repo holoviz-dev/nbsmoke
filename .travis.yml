@@ -1,18 +1,11 @@
-# TODO: this has only been partially updated to use pyct
-
 language: python
 
 stages:
   - lint
   - test
-  - conda_test
   - name: pip_dev_package
     if: tag =~ ^v(\d+|\.)*[a-z]\d*$
   - name: pip_package
-    if: tag =~ ^v(\d+|\.)*[^a-z]\d*$
-  - name: conda_dev_package
-    if: tag =~ ^v(\d+|\.)*[a-z]\d*$
-  - name: conda_package
     if: tag =~ ^v(\d+|\.)*[^a-z]\d*$
 
 jobs:
@@ -30,10 +23,6 @@ jobs:
   - <<: *default
     stage: lint
     env: TOX_ENV=flake8
-
-  - <<: *default
-    python: 2.7
-    env: TOX_ENV=py27
 
   - <<: *default
     python: 3.6
@@ -76,32 +65,3 @@ jobs:
         tags: true
       user: ceball
       password: $PYPI_PWD
-
-  - &conda_default
-    # like a conda-using developer
-    stage: conda_test
-    python: 3.7
-    before_install:
-      - pip install "pyct <0.2.1" && doit install_miniconda && rm -f .doit.db
-      - export PATH="$HOME/miniconda/bin:$PATH"
-      - conda install -y -c pyviz/label/dev -c conda-forge "pyct <0.2.1"
-      - doit ci_configure_conda
-    install:
-      - doit conda_develop_install_alternate --channel=conda-forge
-    script:
-      - conda install -y holoviews
-      - doit unit_tests
-
-  - <<: *conda_default
-    stage: conda_dev_package
-    install:
-      - doit build_conda_package --channel conda-forge
-    script:
-      - doit upload_conda_package --token=$CONDA_UPLOAD_TOKEN --label=dev
-
-  - <<: *conda_default
-    stage: conda_package
-    install:
-      - doit build_conda_package --channel conda-forge    
-    script:
-      - doit upload_conda_package --token=$CONDA_UPLOAD_TOKEN --label=main --label=dev

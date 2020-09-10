@@ -31,7 +31,7 @@ You can install nbsmoke via `pip`_ from `PyPI`_::
 
 Or you can install nbsmoke via `conda`_ from `anaconda.org`_::
 
-    $ conda install -c pyviz/label/dev -c conda-forge nbsmoke
+    $ conda install -c conda-forge nbsmoke
 
 
 Usage
@@ -132,8 +132,9 @@ Contributing
 First, install using ``pip install -e .``. Then run the tests using
 ``tox`` or ``pytest -v tests/``.
 
-New release to PyPI and anaconda.org: ``git tag -a vX.Y.Z -m
-"Something about release" && git push --tags``.
+New release to PyPI: ``git tag -a vX.Y.Z -m "Something about release"
+&& git push --tags``. Then a PR will auto-open on conda-forge, which
+should be merged.
 
 Get some help to debug apparently incorrect flakes by adding
 ``--nbsmoke-lint-debug``,
