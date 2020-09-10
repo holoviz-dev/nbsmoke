@@ -12,5 +12,5 @@ install:
 build: off
 
 test_script:
-  # TODO update to run test suite when tests are in nbsmoke package
-  - python -c "import nbsmoke"
+  - cd %TMP%
+  - pytest -v --pyargs nbsmoke

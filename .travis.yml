@@ -57,7 +57,7 @@ jobs:
   - stage: test_latest_release
     python: 3.7
     install:
-      - pip install nbsmoke
+      - tmp_dir=$(mktemp -d)
+      - cd $tmp_dir && pip install nbsmoke
     script:
-      # TODO: when pytest's tests are in the package, run the tests!
-      - python -c "import nbsmoke"
+      - cd $tmp_dir && pytest -v --pyargs nbsmoke
