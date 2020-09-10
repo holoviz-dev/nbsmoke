@@ -425,14 +425,12 @@ def test_lint_magics_warn_about_unhandled(testdir):
          ".*nbsmoke doesn't know how to process the.*cellmagicnonexistentthree.*CellMagic and has ignored it.*"])
 
 def test_optional_import_warn(testdir):
+    testdir.makeini(r"""
+        [pytest]
+        nbsmoke_magic_handlers = my_magic_handlers.py
+    """)
     testdir.makefile('.ipynb', testing123=nb_optional_dep)
-    ###
-    # what a hack
-    def not_clever_magics_handler(magic):
-        raise ImportError("Amazing dependency is missing")
-    import nbsmoke.lint.magics as M
-    M.other_line_magic_handlers['clever_magic'] = not_clever_magics_handler
-    ###
+    testdir.makefile(".py", my_magic_handlers="def not_clever_magics_handler(magic):\n    raise ImportError('Amazing dependency is missing')\n\nline_magic_handlers=dict(clever_magic=not_clever_magics_handler);cell_magic_handlers={}")
     result = testdir.runpytest(*lint_args)
     assert result.ret == 1
     result.stdout.re_match_lines_random(

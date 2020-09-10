@@ -81,6 +81,8 @@ def pytest_addoption(parser):
     parser.addini('nbsmoke_flakes_cell_magics_blacklist', "cell magics you don't want to see - i.e. treat as lint.")
     parser.addini('nbsmoke_flakes_line_magics_blacklist', "line magics you don't want to see - i.e. treat as lint")
 
+    parser.addini('nbsmoke_magic_handlers', "path to .py file containing custom magic handlers")
+
 
 @contextlib.contextmanager
 def cwd(d):

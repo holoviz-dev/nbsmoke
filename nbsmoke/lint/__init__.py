@@ -42,7 +42,8 @@ class LintNb(pytest.Item):
 
             magics_processor = magics.Processor(
                 extra_line_blacklist = _get_list_from_conf('nbsmoke_flakes_line_magics_blacklist', self.parent.parent.config),
-                extra_cell_blacklist = _get_list_from_conf('nbsmoke_flakes_cell_magics_blacklist', self.parent.parent.config))
+                extra_cell_blacklist = _get_list_from_conf('nbsmoke_flakes_cell_magics_blacklist', self.parent.parent.config),
+                extra_magic_handlers = self.parent.parent.config.getini('nbsmoke_magic_handlers'))
             magics_processor.insert_get_ipython(nb)
 
             ipy, _ = nbconvert.PythonExporter().from_notebook_node(nb)
