@@ -21,7 +21,7 @@ setup_args = dict(
     name='nbsmoke',
     description='Basic notebook checks. Do they run? Do they contain lint?',
     version = version.get_setup_version('nbsmoke'),
-    url='https://github.com/pyviz/nbsmoke',
+    url='https://github.com/pyviz-dev/nbsmoke',
     long_description=read('README.rst'),    
     author='pyviz contributors',
     author_email = "dev@pyviz.org",
@@ -29,18 +29,17 @@ setup_args = dict(
     packages=find_packages(),
     include_package_data = True,
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Framework :: Pytest',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Testing',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
         'License :: OSI Approved :: BSD License',
     ],
     
-    python_requires = ">=2.7",
+    python_requires = ">=3.4",
     
     install_requires=[
         'pytest >=3.1.1',
@@ -53,11 +52,7 @@ setup_args = dict(
         'jupyter_client',
         'nbformat',
         'nbconvert <6',
-    # TODO: I think the decision was to go with python/setup.py for this stuff,
-    # right? (but if so, how do I specify it's the runtime python version
-    # I'm talking aobut, not the buildtime python version?)
-    # Also - not sure exactly what is required now
-    ] + (['ipykernel'] if (sys.version_info[0]>=3 and sys.version_info[1]>4) else ['ipykernel <5']),
+        'ipykernel',
     extras_require = extras_require,
     entry_points={
         'pytest11': [
