@@ -50,7 +50,7 @@ setup_args = dict(
         # * Optional: process ipython magics (required import: IPython)
         'jupyter_client',
         'nbformat',
-        'nbconvert <6',
+        'nbconvert',
         'ipykernel'],
     extras_require = extras_require,
     entry_points={

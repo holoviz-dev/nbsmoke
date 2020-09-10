@@ -95,10 +95,27 @@ for hmm in (builtins_support, holoviews_support):
 # TODO: suddenly had to make some fns into a class to support blacklists; should rework.
 class Processor(object):
 
-    def __init__(self, extra_cell_blacklist=None, extra_line_blacklist=None):
+    def __init__(self, extra_cell_blacklist=None, extra_line_blacklist=None, extra_magic_handlers=None):
         self.blacklisted_cell = (extra_cell_blacklist or []) + BLACKLISTED_CELL_MAGICS
         self.blacklisted_line = (extra_line_blacklist or []) + BLACKLISTED_LINE_MAGICS
+        self.extra_cell_magic_handlers = dict(other_cell_magic_handlers)
+        self.extra_line_magic_handlers = dict(other_line_magic_handlers)
 
+        if extra_magic_handlers:
+            user_cell_magic_handlers, user_line_magic_handlers = self._load_user_magic_handlers(extra_magic_handlers)
+            self.extra_cell_magic_handlers.update(user_cell_magic_handlers)
+            self.extra_line_magic_handlers.update(user_line_magic_handlers)
+
+
+    @staticmethod
+    def _load_user_magic_handlers(path):
+        from importlib import util
+        spec = util.spec_from_file_location("_nbsmoke_user_magic_handlers", path)
+        mod = util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod.cell_magic_handlers, mod.line_magic_handlers
+    
+                                                                      
     @staticmethod
     def insert_get_ipython(nb):
         # define and use get_ipython (for pyflakes)
@@ -152,9 +169,9 @@ class Processor(object):
         if isinstance(magic, NotMagic):
             content = magic.line
         elif isinstance(magic, LineMagic):
-            content = _process_magics(magic, other_line_magic_handlers, IGNORED_LINE_MAGICS, self.blacklisted_line, SIMPLE_LINE_MAGICS)
+            content = _process_magics(magic, self.extra_line_magic_handlers, IGNORED_LINE_MAGICS, self.blacklisted_line, SIMPLE_LINE_MAGICS)
         elif isinstance(magic, CellMagic):
-            content = _process_magics(magic, other_cell_magic_handlers, IGNORED_CELL_MAGICS, self.blacklisted_cell)
+            content = _process_magics(magic, self.extra_cell_magic_handlers, IGNORED_CELL_MAGICS, self.blacklisted_cell)
         else:
             raise
         return content

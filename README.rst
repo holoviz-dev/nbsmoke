@@ -103,6 +103,9 @@ configuration in setup.cfg, pytest.ini, or tox.ini::
     nbsmoke_flakes_cell_magics_blacklist = bash
                                            ruby
 
+    # add your own magic handlers (python file containing line_magic_handlers and cell_magic_handlers as dictionaries magic_name: callable)
+    nbsmoke_magic_handlers = path/to/file.py
+
 
 nbsmoke supports ``# noqa`` comments to mark that something
 should be ignored during lint checking.
