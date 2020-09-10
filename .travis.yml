@@ -75,4 +75,4 @@ jobs:
       - pip install nbsmoke
     script:
       # TODO: when pytest's tests are in the package, run the tests!
-      - true
+      - python -c "import nbsmoke"
