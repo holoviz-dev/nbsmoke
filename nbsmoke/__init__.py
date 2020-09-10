@@ -140,7 +140,10 @@ class IPyNbFile(pytest.File):
         super(IPyNbFile,self).__init__(fspath, parent=parent, config=None, session=None)
 
     def collect(self):
-        yield self._dowhat(str(self.fspath), self)
+        if hasattr(self._dowhat, "from_parent"):
+            yield self._dowhat.from_parent(self,name=str(self.fspath))
+        else: # older pytest (https://docs.pytest.org/en/stable/deprecations.html#node-construction-changed-to-node-from-parent)
+            yield self._dowhat(str(self.fspath), self)
 
 
 def pytest_collect_file(path, parent):
@@ -162,4 +165,7 @@ def pytest_collect_file(path, parent):
                 dowhat = LintNb
             elif opt.nbsmoke_verify:
                 dowhat = VerifyNb
-            return IPyNbFile(path, parent, dowhat=dowhat)
+            if hasattr(IPyNbFile, "from_parent"):
+                return IPyNbFile.from_parent(parent, fspath=path, dowhat=dowhat)
+            else: # for older pytest (https://docs.pytest.org/en/stable/deprecations.html#node-construction-changed-to-node-from-parent)
+                return IPyNbFile(path, parent, dowhat=dowhat)
