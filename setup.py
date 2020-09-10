@@ -13,7 +13,7 @@ def read(fname):
     return codecs.open(file_path, encoding='utf-8').read()
 
 extras_require = {
-    'holoviews-magics': ['holoviews'],
+    'holoviews-magics': ['holoviews'], # only install if you are using holoviews magics (which are deprecated...)
     'verify': ['requests', 'beautifulsoup4'],
 }
 
