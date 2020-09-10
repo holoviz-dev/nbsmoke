@@ -52,7 +52,7 @@ setup_args = dict(
         # * Optional: process ipython magics (required import: IPython)
         'jupyter_client',
         'nbformat',
-        'nbconvert',
+        'nbconvert <6',
     # TODO: I think the decision was to go with python/setup.py for this stuff,
     # right? (but if so, how do I specify it's the runtime python version
     # I'm talking aobut, not the buildtime python version?)
