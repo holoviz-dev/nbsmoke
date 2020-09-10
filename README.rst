@@ -45,7 +45,11 @@ You can install nbsmoke via `pip`_ from `PyPI`_::
 
     $ pip install nbsmoke
 
-Or you can install nbsmoke via `conda`_ from `anaconda.org`_::
+Or get the latest pre-release::
+
+    $ pip install --pre nbsmoke
+
+nbsmoke is also available via `conda`_ from `anaconda.org`_::
 
     $ conda install -c conda-forge nbsmoke
 
