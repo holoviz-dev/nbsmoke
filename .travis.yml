@@ -53,11 +53,11 @@ jobs:
       user: ceball
       password: $PYPI_PWD
 
-  # TODO: don't need to clone the repo
   - stage: test_latest_release
     python: 3.7
     install:
       - pip install nbsmoke
     script:
-      # TODO: when pytest's tests are in the package, run the tests!
-      - python -c "import nbsmoke"
+      - cp -r tests $HOME
+      - cd $HOME && python -c "import nbsmoke"
+      - cd $HOME && pytest -v tests
