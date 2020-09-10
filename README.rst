@@ -8,11 +8,11 @@
 
 .. image:: https://img.shields.io/conda/vn/conda-forge/nbsmoke
     :target: https://anaconda.org/conda-forge/nbsmoke/
-    :alt: Conda
+    :alt: conda-forge
 
 .. image:: https://img.shields.io/conda/dn/conda-forge/nbsmoke.svg?label=conda-forge
     :target: https://anaconda.org/conda-forge/nbsmoke/
-    :alt: Conda downloads
+    :alt: conda-forge downloads
 	  
 .. image:: https://travis-ci.org/pyviz-dev/nbsmoke.svg?branch=master
     :target: https://travis-ci.org/pyviz-dev/nbsmoke
