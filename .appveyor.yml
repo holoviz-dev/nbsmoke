@@ -1,8 +1,7 @@
 environment:
   matrix:
     - TOXENV: py37
-    # jupyter on py38 suffers from https://github.com/tornadoweb/tornado/issues/2608
-    # - TOXENV: py38    
+    - TOXENV: py38
 
 matrix:
   fast_finish: true
