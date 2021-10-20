@@ -40,7 +40,7 @@ def test_run_good_html(testdir):
 
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"42"})
 
-    args = run_args + ['--store-html=%s'%testdir.path]
+    args = run_args + ['--store-html=%s'%testdir.tmpdir.strpath]
     # nbconvert.HTMLExporter.from_notebook_node seems to be raising
     # a ResourceWarning that is caught by pytest and causes the test
     # to fail (the test suite fails if a warning is emitted). pytest
