@@ -27,8 +27,8 @@ class VerifyNb(pytest.Item):
             _missing.append("  * requests not available - please install requests")
         if _missing:
             raise Exception("nbsmoke verify failed to execute because of missing modules:\n"+"\n".join(_missing))
-        ###################################################        
-        
+        ###################################################
+
         filename = self.name
 
         bad_modules = check_modules(filename)
@@ -53,7 +53,7 @@ try:
     from bs4 import BeautifulSoup
 except:
     BeautifulSoup = None
-            
+
 ###################################################
 ###################################################
 # rest of this file is quickly copied in code from datashader
@@ -67,7 +67,11 @@ except:
 
 def export_as_html(filename):
     html_exporter = nbconvert.HTMLExporter()
-    html_exporter.template_file = 'basic'
+    # Backwards incompatible change in nbconvert 6 in template file names
+    if nbconvert.version_info[0] < 6:
+        html_exporter.template_file = 'basic'
+    else:
+        html_exporter.template_file = 'classic/base.html.j2'
     body, _ = html_exporter.from_filename(filename)
     return body
 
