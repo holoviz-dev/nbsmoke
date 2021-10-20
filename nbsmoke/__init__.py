@@ -122,6 +122,11 @@ class RunNb(pytest.Item):
             # TODO: clean up this option handling
             if self.parent.parent.config.option.store_html != '':
                 he = nbconvert.HTMLExporter()
+                # Backwards incompatible change in nbconvert 6 in template file names
+                if nbconvert.version_info[0] < 6:
+                    he.template_file = 'basic'
+                else:
+                    he.template_file = 'classic/base.html.j2'
                 # could maybe use this for chance of testing the html? but not the aim of this project
                 #he.template_file = 'basic'
                 html, resources = he.from_notebook_node(notebook)
