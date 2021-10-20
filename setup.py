@@ -14,6 +14,10 @@ def read(fname):
 extras_require = {
     'holoviews-magics': ['holoviews'], # only install if you are using holoviews magics (which are deprecated...)
     'verify': ['requests', 'beautifulsoup4'],
+    'tests': [
+        'flake8',
+        'coveralls',
+    ],
 }
 
 setup_args = dict(
