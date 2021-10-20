@@ -60,7 +60,13 @@ class LintNb(pytest.Item):
             flake_result = _pyflakes.flake_check(
                 # notebooks will start with "coding: utf-8", but py already unicode
                 py.encode('utf8') if sys.version_info[0]==2 else py,
-                self.name)
+                # flake_check uses the builtin compile function which takes a filename
+                # as input. From Python 3.9 we've seen that this filename isn't just used
+                # as metadata indicating where the code source origin, it's also used
+                # to report the content of the line that errored. This doesn't work for
+                # us, our source code is a python string and the filename points to
+                # a notebook. So the trick is just to pass the repr of the filename.
+                filename="%r" % self.name)
 
             ### remove flakes by regex ###
             _user_flakes_to_ignore = self.parent.parent.config.getini('nbsmoke_flakes_to_ignore')
