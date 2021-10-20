@@ -11,43 +11,43 @@ from . import nb_basic, run_args
 # around somewhere in jupyter (https://github.com/pyviz-dev/nbsmoke/issues/45)
 
 # maybe this test is overkill now we check for certain output in the run tests?
-def test_definitely_ran_paranoid(pytester):
+def test_definitely_ran_paranoid(testdir):
     assert not os.path.exists('sigh')
-    pytester.makefile('.ipynb', testing123=nb_basic%{'the_source':"open('x','w').write('y')"})
-    result = pytester.runpytest_subprocess(*run_args)
+    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"open('x','w').write('y')"})
+    result = testdir.runpytest_subprocess(*run_args)
     assert result.ret==0
     with open('x','r') as f:
         assert f.read() == 'y'
     assert os.path.isfile('sigh')
 
-def test_run_good(pytester):
-    pytester.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/1"})
-    result = pytester.runpytest_subprocess(*run_args)
+def test_run_good(testdir):
+    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/1"})
+    result = testdir.runpytest_subprocess(*run_args)
     assert result.ret == 0
     result.stdout.re_match_lines_random(
         [".*collected 1 item$",
          ".*testing123.ipynb.*PASSED.*"])
 
-def test_run_bad(pytester):
-    pytester.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/0"})
-    result = pytester.runpytest_subprocess(*run_args)
+def test_run_bad(testdir):
+    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/0"})
+    result = testdir.runpytest_subprocess(*run_args)
     assert result.ret == 1
     result.stdout.re_match_lines_random([".*ZeroDivisionError.*"])
 
-def test_run_good_html(pytester):
-    outhtml = os.path.join(pytester.path,'testing123.ipynb.html')
+def test_run_good_html(testdir):
+    outhtml = os.path.join(testdir.tmpdir.strpath,'testing123.ipynb.html')
     assert not os.path.exists(outhtml)
 
-    pytester.makefile('.ipynb', testing123=nb_basic%{'the_source':"42"})
+    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"42"})
 
-    args = run_args + ['--store-html=%s'%pytester.path]
+    args = run_args + ['--store-html=%s'%testdir.path]
     # nbconvert.HTMLExporter.from_notebook_node seems to be raising
     # a ResourceWarning that is caught by pytest and causes the test
     # to fail (the test suite fails if a warning is emitted). pytest
     # catches this kind of warning (unraisable) from Python 3.8.
     if sys.version_info >= (3, 8):
         args += ['-p', 'no:unraisableexception']
-    result = pytester.runpytest_subprocess(*args)
+    result = testdir.runpytest_subprocess(*args)
     assert result.ret == 0
 
     # test that html has happened
@@ -65,17 +65,17 @@ def test_run_good_html(pytester):
     assert answer == [42,42]
 
 
-def test_skip_run(pytester):
-    pytester.makeini(r"""
+def test_skip_run(testdir):
+    testdir.makeini(r"""
         [pytest]
         nbsmoke_skip_run = ^.*skipme\.ipynb$
                            ^.*skipmetoo.*$
     """)
-    pytester.makefile('.ipynb', skipme=nb_basic%{'the_source':"1/0"})
-    pytester.makefile('.ipynb', alsoskipme=nb_basic%{'the_source':"1/0"})
-    pytester.makefile('.ipynb', skipmetoo=nb_basic%{'the_source':"1/0"})
-    pytester.makefile('.ipynb', skipmenot=nb_basic%{'the_source':"1/1"})
-    result = pytester.runpytest_subprocess(*run_args)
+    testdir.makefile('.ipynb', skipme=nb_basic%{'the_source':"1/0"})
+    testdir.makefile('.ipynb', alsoskipme=nb_basic%{'the_source':"1/0"})
+    testdir.makefile('.ipynb', skipmetoo=nb_basic%{'the_source':"1/0"})
+    testdir.makefile('.ipynb', skipmenot=nb_basic%{'the_source':"1/1"})
+    result = testdir.runpytest_subprocess(*run_args)
     assert result.ret == 0
     result.stdout.re_match_lines_random(
         [".*collected 4 items$",
@@ -84,11 +84,10 @@ def test_skip_run(pytester):
          ".*skipmenot.ipynb.*PASSED",
          ".*skipmetoo.ipynb.*SKIPPED"])
 
-def test_cwd_like_jupyter_notebook(pytester):
-    p = pytester.mkdir("sub") / "hello.txt"
-    p.touch()
-    p.write_text("content")
-    pytester.makefile('.ipynb', testing123=nb_basic%{'the_source':"import os; assert os.path.isfile('hello.txt')"})
+def test_cwd_like_jupyter_notebook(testdir):
+    p = testdir.tmpdir.mkdir("sub").join("hello.txt")
+    p.write("content")
+    testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"import os; assert os.path.isfile('hello.txt')"})
     shutil.move('testing123.ipynb', 'sub')
-    result = pytester.runpytest_subprocess(*run_args)
+    result = testdir.runpytest_subprocess(*run_args)
     assert result.ret == 0
