@@ -40,15 +40,21 @@ def test_run_good_html(pytester):
 
     pytester.makefile('.ipynb', testing123=nb_basic%{'the_source':"42"})
 
-    result = pytester.runpytest_inprocess(*(run_args+['--store-html=%s'%pytester.path]))
-    # result = pytester.runpytest_inprocess(*(run_args))
+    args = run_args + ['--store-html=%s'%pytester.path]
+    # nbconvert.HTMLExporter.from_notebook_node seems to be raising
+    # a ResourceWarning that is caught by pytest and causes the test
+    # to fail (the test suite fails if a warning is emitted). pytest
+    # catches this kind of warning (unraisable) from Python 3.8.
+    if sys.version_info >= (3, 8):
+        args += ['-p', 'no:unraisableexception']
+    result = pytester.runpytest_subprocess(*args)
     assert result.ret == 0
 
     # test that html has happened
     targets = [
         "<pre>42</pre>",
                                                # note: this is really what happens in a python2 notebook
-        "<pre>&#39;中国&#39;</pre>" if sys.version_info[0]==3 else r"<pre>u&#39;\u4e2d\u56fd&#39;</pre>"]
+        "<pre>&#39;中国&#39;</pre>" if sys.version_info[0]>=3 else r"<pre>u&#39;\u4e2d\u56fd&#39;</pre>"]
     answer = [None,None]
 
     with io.open(outhtml,encoding='utf8') as f:
