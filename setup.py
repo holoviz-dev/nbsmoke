@@ -18,6 +18,14 @@ extras_require = {
         'flake8',
         'coveralls',
     ],
+    # until pyproject.toml/equivalent is widely supported (setup_requires
+    # doesn't work well with pip)
+    'build': [
+        'param >=1.7.0',
+        'pyct >=0.4.4',
+        'setuptools >=30.3.0',
+        'wheel',
+    ]
 }
 
 setup_args = dict(
