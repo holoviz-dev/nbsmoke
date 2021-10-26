@@ -49,6 +49,7 @@ jobs:
       - name: what's in there
         run: |
           ls -ll
+          ls -ll nbsmoke
       - name: and git?
         run: |
           git status
@@ -106,6 +107,7 @@ jobs:
       - name: what's in there
         run: |
           ls -ll
+          ls -ll nbsmoke
       - name: and git?
         run: |
           git status
