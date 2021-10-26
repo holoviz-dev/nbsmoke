@@ -34,8 +34,6 @@ test:
     {% for dep in sdata['extras_require']['tests'] %}
     - {{ dep }}
     {% endfor %}
-  source_files:
-    - tests
 
 about:
   home: {{ sdata['url'] }}
