@@ -72,6 +72,7 @@ setup_args = dict(
     python_requires = ">=3.4",
     
     install_requires=[
+        'param >=1.7.0',
         'pytest >=3.1.1',
         ########## lint stuff
         'pyflakes',
