@@ -31,7 +31,7 @@ test:
   imports:
     - nbsmoke
   requires:
-    {% for dep in sdata['extras_require']['tests'] %}
+    {% for dep in sdata['extras_require']['all'] %}
     - {{ dep }}
     {% endfor %}
 
