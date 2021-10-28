@@ -40,9 +40,9 @@ extras_require = {
     # until pyproject.toml/equivalent is widely supported (setup_requires
     # doesn't work well with pip)
     'build': [
-        'param >=1.7.0',
-        'pyct >=0.4.4',
-        'setuptools >=30.3.0',
+        'param>=1.7.0',
+        'pyct>=0.4.4',
+        'setuptools>=30.3.0',
         'wheel',
     ]
 }
@@ -72,8 +72,8 @@ setup_args = dict(
     python_requires = ">=3.4",
     
     install_requires=[
-        'param >=1.7.0',
-        'pytest >=3.1.1',
+        'param>=1.7.0',
+        'pytest>=3.1.1',
         ########## lint stuff
         'pyflakes',
         ########## notebook stuff (reading, executing)
