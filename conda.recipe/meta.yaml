@@ -1,71 +1,41 @@
+{% set sdata = load_setup_py_data() %}
+
 package:
   name: nbsmoke
-  version: 0.6.0
+  version: {{ sdata['version'] }}
+
 source:
-  path: /Users/mliquet/work/dev/nbsmoke
+  path: ..
+
 build:
   noarch: python
   script: python setup.py install --single-version-externally-managed --record=record.txt
+
+extra:
+  channels:
+    - pyviz
+
 requirements:
   build:
-    - ca-certificates 2021.10.26 hecd8cb5_2
-    - libcxx 12.0.0 h2f01273_0
-    - tzdata 2021e hda174b7_0
-    - xz 5.2.5 h1de35cc_0
-    - yaml 0.2.5 haf1e3a3_0
-    - zlib 1.2.11 h1de35cc_3
-    - libffi 3.3 hb1e8313_2
-    - ncurses 6.2 h0a44026_1
-    - openssl 1.1.1l h9ed2024_0
-    - tk 8.6.11 h7bc2e8c_0
-    - readline 8.1 h9ed2024_0
-    - sqlite 3.36.0 hce871da_0
-    - python 3.9.7 h88f2d9e_1
-    - certifi 2021.10.8 py39hecd8cb5_0
-    - charset-normalizer 2.0.4 pyhd3eb1b0_0
-    - idna 3.2 pyhd3eb1b0_0
-    - param 1.11.1 pyhd3eb1b0_0
-    - pycparser 2.20 py_2
-    - pysocks 1.7.1 py39hecd8cb5_0
-    - pyyaml 5.4.1 py39h9ed2024_1
-    - six 1.16.0 pyhd3eb1b0_0
-    - wheel 0.37.0 pyhd3eb1b0_1
-    - cffi 1.14.6 py39h2125817_0
-    - setuptools 58.0.4 py39hecd8cb5_0
-    - brotlipy 0.7.0 py39h9ed2024_1003
-    - cryptography 35.0.0 py39h2fd3fbb_0
-    - pip 21.2.4 py39hecd8cb5_0
-    - pyopenssl 21.0.0 pyhd3eb1b0_1
-    - urllib3 1.26.7 pyhd3eb1b0_0
-    - requests 2.26.0 pyhd3eb1b0_0
-    - pyct 0.4.6 py39hecd8cb5_0
+    - python {{ sdata['python_requires'] }}
+    {% for dep in sdata['extras_require']['build'] %}
+    - {{ dep }}
+    {% endfor %}
   run:
-    - nbformat
-    - param>=1.7.0
-    - nbconvert
-    - ipykernel
-    - pytest>=3.1.1
-    - python >=3.4
-    - jupyter_client
-    - pyflakes
+    - python {{ sdata['python_requires'] }}
+    {% for dep in sdata.get('install_requires',{}) %}
+    - {{ dep }}
+    {% endfor %}
+
 test:
   imports:
     - nbsmoke
   requires:
-    - holoviews
-    - flake8
-    - pyct>=0.4.4
-    - param>=1.7.0
-    - requests
-    - setuptools>=30.3.0
-    - beautifulsoup4
-    - coveralls
-    - wheel
+    {% for dep in sdata['extras_require']['tests'] %}
+    - {{ dep }}
+    {% endfor %}
+
 about:
-  home: https://github.com/pyviz-dev/nbsmoke
-  license: BSD-3
-  summary: Basic notebook checks. Do they run? Do they contain lint?
-extra:
-  channels:
-    - pyviz
-  
+  home: {{ sdata['url'] }}
+  summary: {{ sdata['description'] }}
+  license: {{ sdata['license'] }}

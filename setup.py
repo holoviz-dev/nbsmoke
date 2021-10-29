@@ -33,19 +33,21 @@ def read(fname):
 extras_require = {
     'holoviews-magics': ['holoviews'], # only install if you are using holoviews magics (which are deprecated...)
     'verify': ['requests', 'beautifulsoup4'],
-    'tests': [
-        'flake8',
-        'coveralls',
-    ],
     # until pyproject.toml/equivalent is widely supported (setup_requires
     # doesn't work well with pip)
     'build': [
         'param>=1.7.0',
-        'pyct>=0.4.4',
+        'pyct>=0.5.0',
         'setuptools>=30.3.0',
-        'wheel',
     ]
 }
+
+extras_require['tests'] = [
+    'flake8',
+    'coveralls',
+]
+extras_require['tests'] += extras_require['holoviews-magics']
+extras_require['tests'] += extras_require['verify']
 
 setup_args = dict(
     name='nbsmoke',
