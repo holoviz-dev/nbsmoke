@@ -41,7 +41,12 @@ extras_require = {
         'setuptools>=30.3.0',
     ],
     'lint': ['flake8'],
-    'tests': ['coverage'],
+    'tests': [
+        'coverage',
+        'twine',   # required for pip packaging
+        'rfc3986', # required by twine
+        'keyring', # required by twine
+    ],
 }
 
 extras_require['tests'] += extras_require['lint']
