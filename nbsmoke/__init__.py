@@ -9,19 +9,16 @@ import os
 import io
 import contextlib
 
+import param
+
 import pytest
 import nbformat
 import nbconvert
 from nbconvert.preprocessors import ExecutePreprocessor
 
-try:
-    from version import Version
-    __version__ = str(Version(fpath=__file__,archive_commit="$Format:%h$",reponame="nbsmoke"))
-    del Version
-except:
-    import json
-    __version__ = json.load(open(os.path.join(os.path.dirname(__file__),'.version'),'r'))['version_string']
-    del json
+
+__version__ = str(param.version.Version(
+    fpath=__file__, archive_commit="$Format:%h$", reponame="panel"))
 
 from .lint import LintNb
 from .verify import VerifyNb
