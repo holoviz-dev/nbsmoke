@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Note: declare this here instead of in conftest.py because
-# running `coverage run pytest` fails when the tests dir is
-# a subdir of nbsmoke.
-pytest_plugins = 'pytester'
-
 # note: magics in here just to check they do not directly cause
 # errors.
 

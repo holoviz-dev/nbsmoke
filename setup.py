@@ -40,7 +40,8 @@ extras_require = {
         'pyct>=0.4.4',
         'setuptools>=30.3.0',
     ],
-    'lint': ['flake8']
+    'lint': ['flake8'],
+    'tests': ['coverage'],
 }
 
 extras_require['tests'] = extras_require['lint'].copy()
