@@ -44,7 +44,7 @@ extras_require = {
     'tests': ['coverage'],
 }
 
-extras_require['tests'] = extras_require['lint'].copy()
+extras_require['tests'] += extras_require['lint']
 extras_require['tests'] += extras_require['holoviews-magics']
 extras_require['tests'] += extras_require['verify']
 
