@@ -33,8 +33,6 @@ jobs:
         with:
           miniconda-version: "latest"
           python-version: ${{ env.PYTHON_VERSION }}
-      - name: Fetch unshallow
-        run: git fetch --prune --tags --unshallow -f
       - name: Set output
         id: vars
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
@@ -80,8 +78,6 @@ jobs:
         with:
           miniconda-version: "latest"
           python-version: ${{ env.PYTHON_VERSION }}
-      - name: Fetch unshallow
-        run: git fetch --prune --tags --unshallow -f
       - name: conda setup
         run: |
           conda config --set always_yes True
