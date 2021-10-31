@@ -39,13 +39,11 @@ extras_require = {
         'param>=1.7.0',
         'pyct>=0.4.4',
         'setuptools>=30.3.0',
-    ]
+    ],
+    'lint': ['flake8']
 }
 
-extras_require['tests'] = [
-    'flake8',
-    'coveralls',
-]
+extras_require['tests'] = extras_require['lint'].copy()
 extras_require['tests'] += extras_require['holoviews-magics']
 extras_require['tests'] += extras_require['verify']
 
