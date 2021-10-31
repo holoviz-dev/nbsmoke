@@ -2,11 +2,11 @@ name: packages
 
 on:
   push:
-    # tags:
-    # - 'v[0-9]+.[0-9]+.[0-9]+'
-    # - 'v[0-9]+.[0-9]+.[0-9]+a[0-9]+'
-    # - 'v[0-9]+.[0-9]+.[0-9]+b[0-9]+'
-    # - 'v[0-9]+.[0-9]+.[0-9]+rc[0-9]+'
+    tags:
+    - 'v[0-9]+.[0-9]+.[0-9]+'
+    - 'v[0-9]+.[0-9]+.[0-9]+a[0-9]+'
+    - 'v[0-9]+.[0-9]+.[0-9]+b[0-9]+'
+    - 'v[0-9]+.[0-9]+.[0-9]+rc[0-9]+'
 
 jobs:
   conda_build:
@@ -46,21 +46,14 @@ jobs:
       - name: doit env_capture
         run: |
           doit env_capture
-      - name: what's in there
-        run: |
-          ls -ll
-          ls -ll nbsmoke
-      - name: and git?
-        run: |
-          git status
       - name: conda build
         run: doit package_build $CHANS_DEV
-      # - name: conda dev upload
-      #   if: (contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc'))
-      #   run: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev
-      # - name: conda main upload
-      #   if: (!(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
-      #   run: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main
+      - name: conda dev upload
+        if: (contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc'))
+        run: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev
+      - name: conda main upload
+        if: (!(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
+        run: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main
   pip_build:
     name: Build PyPI Packages
     runs-on: 'ubuntu-latest'
@@ -104,20 +97,13 @@ jobs:
       - name: doit env_capture
         run: |
           doit env_capture
-      - name: what's in there
-        run: |
-          ls -ll
-          ls -ll nbsmoke
-      - name: and git?
-        run: |
-          git status
       - name: pip build
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           doit ecosystem=pip package_build $PKG_TEST_PYTHON --test-group=all
-      # - name: pip upload
-      #   run: |
-      #     eval "$(conda shell.bash hook)"
-      #     conda activate test-environment
-      #     doit ecosystem=pip package_upload -u $PPU -p $PPP -r $PYPI
+      - name: pip upload
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          doit ecosystem=pip package_upload -u $PPU -p $PPP -r $PYPI
