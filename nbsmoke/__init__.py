@@ -8,6 +8,7 @@ import re
 import os
 import io
 import contextlib
+import sys
 
 import param
 
@@ -91,6 +92,20 @@ def cwd(d):
         os.chdir(orig)
 
 
+def fixup_windows_event_loop_policy() -> None:
+    if (
+        sys.platform == 'win32'
+        and sys.version_info[:3] >= (3, 8, 0)
+        and tornado.version_info < (6, 1)
+    ):
+        import asyncio
+        if type(asyncio.get_event_loop_policy()) is asyncio.WindowsProactorEventLoopPolicy:
+            # WindowsProactorEventLoopPolicy is not compatible with tornado 6
+            # fallback to the pre-3.8 default of WindowsSelectorEventLoopPolicy
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+
+fixup_windows_event_loop_policy()
 
 ###################################################
 
