@@ -18,8 +18,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        os: ['ubuntu-latest']
+        # os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        python-version: [3.6, 3.7]
+        # python-version: [3.6, 3.7, 3.8, 3.9]
     timeout-minutes: 60
     defaults:
       run:
@@ -39,7 +41,7 @@ jobs:
           miniconda-version: "latest"
       - name: conda setup
         run: |
-          conda install -c pyviz "pyctdev>=0.5"
+          conda install -n base -c conda-forge mamba --no-update-deps
           conda create -n ${{ env.ENV_NAME }}
           conda activate ${{ env.ENV_NAME }}
           conda config --env --prepend channels pyviz
@@ -48,7 +50,7 @@ jobs:
         run: |
           eval "$(conda shell.bash hook)"
           conda activate ${{ env.ENV_NAME }}
-          doit develop_install -o all
+          doit develop_install -o all --conda-mode=mamba
       - name: doit env_capture
         run: |
           eval "$(conda shell.bash hook)"
