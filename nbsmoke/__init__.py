@@ -93,6 +93,13 @@ def cwd(d):
 
 
 def fixup_windows_event_loop_policy() -> None:
+    try:
+        import tornado
+    except ImportError:
+        tornado = None
+    if not tornado:
+        return
+    # This part of the code comes from Bokeh's source code.
     if (
         sys.platform == 'win32'
         and sys.version_info[:3] >= (3, 8, 0)
