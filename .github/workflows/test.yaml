@@ -26,7 +26,7 @@ jobs:
         shell: bash -l {0} 
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
-      CHANS_DEV: "-c pyviz -c bokeh"
+      CHANS_DEV: "-c pyviz"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ENV_NAME: "nbsmoke"
     steps:
@@ -41,10 +41,7 @@ jobs:
           miniconda-version: "latest"
       - name: conda setup
         run: |
-          conda config --set always_yes True
-          conda --version
           conda install -c pyviz "pyctdev>=0.5"
-          doit ecosystem_setup
           doit env_create ${{ env.CHANS_DEV}} --name=${{ env.ENV_NAME }} --python=${{ matrix.python-version }}
       - name: doit develop_install
         run: |

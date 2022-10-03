@@ -120,11 +120,23 @@ class Processor(object):
     def insert_get_ipython(nb):
         # define and use get_ipython (for pyflakes)
         if len(nb['cells']) > 0:
+            is_id_field = 'id' in nb['cells'][0]
             # the get_ipython() is so pyflakes doesn't complain if no
             # magics present (which would leave get_ipython unused)
             get_ipython_cell = nbformat.v4.new_code_cell(
                 'from IPython import get_ipython\nget_ipython()')
             nb['cells'].insert(0,get_ipython_cell)
+            # Starting from nbformat 4.5 notebook cells must have an id field.
+            # So adding a new cell with new_code_cell will add a cell with an id field.
+            # However, if the notebook was based on a previous version (e.g. 4.2),
+            # then it would contain a mix of id and non id cells. Newer versions
+            # of nbformat (5.6) raise an error when validating such notebook while
+            # before they were mutating it. nbconvert uses nbformat to validate
+            # it build proper notebooks, in particular after applying preprocessors.
+            # This change remove the id added by new_code_cell if the notebook
+            # didn't have ids (just checking the first cell...).
+            if 'id' in nb['cells'][0] and not is_id_field:
+                del nb['cells'][0]['id']
 
 
     def ipython_to_python_for_flake_checks(self, ipy):
