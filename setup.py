@@ -76,7 +76,7 @@ setup_args = dict(
         'License :: OSI Approved :: BSD License',
     ],
     
-    python_requires = ">=3.4",
+    python_requires = ">=3.6",
     
     install_requires=[
         'param>=1.7.0',
