@@ -42,7 +42,8 @@ jobs:
           conda install -n base -c conda-forge mamba --no-update-deps
           conda create -n ${{ env.ENV_NAME }}
           conda activate ${{ env.ENV_NAME }}
-          conda config --env --prepend channels pyviz
+          conda config --env --append channels pyviz --append channels conda-forge
+          conda config --env --remove channels defaults
           conda install python=${{ matrix.python-version }} pyctdev
       - name: doit develop_install
         run: |
