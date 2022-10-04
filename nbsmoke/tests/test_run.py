@@ -36,7 +36,10 @@ def test_run_good(testdir):
 
 def test_run_bad(testdir):
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/0"})
-    result = testdir.runpytest_subprocess(*run_args)
+    # Suppress reporting test as failed when a warning is emitted,
+    # due to ResourceWarning raised by pyzmq. This should be removed later.
+    args = run_args.copy(); args.remove(WARNINGS_ARE_ERRORS)
+    result = testdir.runpytest_subprocess(*args)
     assert result.ret == 1
     result.stdout.re_match_lines_random([".*ZeroDivisionError.*"])
 
