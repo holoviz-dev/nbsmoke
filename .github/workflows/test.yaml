@@ -29,6 +29,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ENV_NAME: "nbsmoke"
+      SETUPTOOLS_ENABLE_FEATURES: "legacy-editable"
     steps:
       - uses: actions/checkout@v2
         with:

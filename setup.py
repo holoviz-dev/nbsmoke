@@ -13,15 +13,11 @@ def get_setup_version(reponame):
     """
     basepath = os.path.split(__file__)[0]
     version_file_path = os.path.join(basepath, reponame, '.version')
-    import sys
-    print('DEBUG PYTHON', sys.executable)
     try:
         from param import version
     except Exception:
-        print('Couldnot import Param')
         version = None
     if version is not None:
-        print('Getting verson from param.version for', reponame)
         return version.Version.setup_version(basepath, reponame, archive_commit="$Format:%h$")
     else:
         print("WARNING: param>=1.6.0 unavailable. If you are installing a package, "
