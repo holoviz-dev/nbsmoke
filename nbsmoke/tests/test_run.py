@@ -28,6 +28,7 @@ def test_run_good(testdir):
     # Suppress reporting test as failed when a warning is emitted,
     # due to ResourceWarning raised by pyzmq. This should be removed later.
     args = run_args.copy(); args.remove(WARNINGS_ARE_ERRORS)
+    'dummy'
     result = testdir.runpytest_subprocess(*args)
     assert result.ret == 0
     result.stdout.re_match_lines_random(
