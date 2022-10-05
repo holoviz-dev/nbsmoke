@@ -6,6 +6,7 @@ from . import nb_basic, WARNINGS_ARE_ERRORS, lint_args
 
 
 def test_lint_good(testdir):
+    dummy
     testdir.makefile('.ipynb', testing123=nb_basic%{'the_source':"1/1"})
     result = testdir.runpytest(*lint_args)
     assert result.ret == 0
