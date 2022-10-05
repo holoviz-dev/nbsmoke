@@ -11,7 +11,7 @@ nbsmoke
 
 * * * * *
 
-Basic notebook smoke tests: Do they run ok? Do they contain lint?
+Basic notebook smoke tests: Do they run ok? Do they contain lint? dummy
 
 * * * * *
 
