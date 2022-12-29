@@ -4,7 +4,7 @@ nbsmoke
 |    |    |
 | --- | --- |
 | Build Status | [![Linux/MacOS/Windows Build Status](https://github.com/pyviz-dev/nbsmoke/workflows/tests/badge.svg)](https://github.com/pyviz-dev/nbsmoke/actions/workflows/tests.yaml)
-| Coverage | [![codecov](https://codecov.io/gh/pyviz-dev/nbsmoke/branch/master/graph/badge.svg)](https://codecov.io/gh/pyviz-dev/nbsmoke) ||
+| Coverage | [![codecov](https://codecov.io/gh/pyviz-dev/nbsmoke/branch/main/graph/badge.svg)](https://codecov.io/gh/pyviz-dev/nbsmoke) ||
 | Latest dev release | [![Github tag](https://img.shields.io/github/v/tag/pyviz-dev/nbsmoke.svg?label=tag&colorB=11ccbb)](https://github.com/pyviz-dev/nbsmoke/tags)  |
 | Latest release | [![Github release](https://img.shields.io/github/release/pyviz-dev/nbsmoke.svg?label=tag&colorB=11ccbb)](https://github.com/pyviz-dev/nbsmoke/releases) [![PyPI version](https://img.shields.io/pypi/v/nbsmoke.svg?colorB=cc77dd)](https://pypi.python.org/pypi/nbsmoke) [![nbsmoke version](https://img.shields.io/conda/v/pyviz/nbsmoke.svg?colorB=4488ff&style=flat)](https://anaconda.org/pyviz/nbsmoke) [![conda-forge version](https://img.shields.io/conda/v/conda-forge/nbsmoke.svg?label=conda%7Cconda-forge&colorB=4488ff)](https://anaconda.org/conda-forge/nbsmoke) [![defaults version](https://img.shields.io/conda/v/anaconda/nbsmoke.svg?label=conda%7Cdefaults&style=flat&colorB=4488ff)](https://anaconda.org/anaconda/nbsmoke) |
 | Python | [![Python support](https://img.shields.io/pypi/pyversions/nbsmoke.svg)](https://pypi.org/project/nbsmoke/)
