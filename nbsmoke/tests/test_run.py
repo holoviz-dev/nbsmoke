@@ -8,7 +8,7 @@ import shutil
 from . import nb_basic, run_args, WARNINGS_ARE_ERRORS
 
 # tests are run in subprocess because otherwise some state seems to be left
-# around somewhere in jupyter (https://github.com/pyviz-dev/nbsmoke/issues/45)
+# around somewhere in jupyter (https://github.com/holoviz-dev/nbsmoke/issues/45)
 
 # maybe this test is overkill now we check for certain output in the run tests?
 def test_definitely_ran_paranoid(testdir):
